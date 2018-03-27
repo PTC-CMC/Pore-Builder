@@ -6,6 +6,7 @@ from mbuild.coordinate_transform import force_overlap
 from mbuild.utils.validation import assert_port_exists
 from mbuild import clone
 from copy import deepcopy
+import math
 
 __all__ = ['Pores']
 
@@ -39,8 +40,10 @@ class Pores(mb.Compound):
         
         # Do some math to figure out how much to replicate graphene cell. TODO: Figure out if rounding is necessary
         # Multiply replicate[1] by 15/13 to take into account later multiplication
-        replicate = [(self.x_sheet/0.246),
-                (self.y_sheet/0.246)*(15/13)]
+        factor = np.cos(math.pi/6)
+        print(factor)
+        replicate = [(self.x_sheet/0.2456),
+                (self.y_sheet/0.2456)*(1/factor)]
         if all(x <= 0 for x in [x_sheet, y_sheet]):
             raise ValueError('Dimension of graphene sheet must be greater than zero')
         self.name = 'C'
@@ -54,7 +57,7 @@ class Pores(mb.Compound):
             if particle.xyz[0][0] < 0:
                 particle.xyz[0][0] += graphene.periodicity[0]
         self.graphene_dims = graphene.periodicity
-        self.graphene_dims[1] *= 13/15 # cos(30)*.246
+        self.graphene_dims[1] *= factor # cos(30)*.246
         bottom_sheet = mb.clone(graphene)
         bottom_sheet.translate([0, self.pore_width+(self.graphene_dims[2]-.335), 0]) 
         bottom_sheet.spin(1.5708,[1,0,0])
