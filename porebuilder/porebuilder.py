@@ -69,6 +69,8 @@ class Pores(mb.Compound):
         bottom_sheet.spin(1.5708,[1,0,0])
         top_sheet = mb.clone(graphene)
         top_sheet.spin(1.5708,[1,0,0])
+        self.bot_xyz = bottom_sheet.xyz
+        self.top_xyz = top_sheet.xyz
         system = mb.Compound()
         system.from_parmed(structure=bottom_sheet.to_parmed() + top_sheet.to_parmed())
         if solvent:
