@@ -21,16 +21,22 @@ class Pores(mb.Compound):
         dimensions of graphene sheet in y-direction [nm]
     sheets: int
         number of graphene sheets, default=3
-    pore_width: width of slit pore [nm]
-    x_bulk: length of bulk region in x-direction [nm]
-    solvent: optional
+    pore_width: int
+        width of slit pore [nm]
+    x_bulk: int
+        length of bulk region in x-direction [nm]
+    solvent: dict {'name': 'solvent file'}, optional, Default=None
         compound to solvate the system with.  If not provided, system will not be solvated
+    n_solvent: int, optional, Default=None
+        number of solvents to solvate the system with.  If not
+        provided, system will not be solvated
     Attributes
     ----------
     
     Notes: Match graphene y-dimension with box x-dimension
     """
-    def __init__(self,x_sheet, y_sheet, sheets, pore_width, x_bulk, solvent):
+    def __init__(self,x_sheet, y_sheet, sheets, pore_width, x_bulk,
+            solvent=None, n_solvent=None):
         super(Pores,self).__init__()
         self.x_sheet = x_sheet
         self.y_sheet = y_sheet
@@ -66,24 +72,25 @@ class Pores(mb.Compound):
         system = mb.Compound()
         system.from_parmed(structure=bottom_sheet.to_parmed() + top_sheet.to_parmed())
         if solvent:
-            self._solvate(solvent=solvent, n_compounds=5083, system=system)
+            self._solvate(solvent=solvent, n_solvent=n_solvent, system=system)
         else:
             self.add(system)
-    def _solvate(self, system, solvent, n_compounds):
+    def _solvate(self, system, solvent, n_solvent):
         """Solvate slit pore box
         Parameters
         ----------
         solvent: dictionary
             Compound and residue name to load into system {'name': compound}
-        n_compounds: int
+        n_solvent: int
             Number of compounds to solvate with
         """
         for key, value in solvent.items():
             fluid = mb.load(value)
             fluid.name = key
-        box = [(self.x_bulk*2)+self.graphene_dims[0],
-                self.pore_width+(2*(self.graphene_dims[2]-0.335)),
+        box = [(self.x_bulk*2)+self.graphene_dims[0]+.5,
+                self.pore_width+(2*(self.graphene_dims[2]-0.335)+.5),
                 self.graphene_dims[1]]
-        system = mb.solvate(system, fluid, n_compounds, box=box, overlap=0.2)
+        print(box)
+        system = mb.solvate(system, fluid, n_solvent, box=box, overlap=0.2)
         system.periodicity = box
         self.add(system)
