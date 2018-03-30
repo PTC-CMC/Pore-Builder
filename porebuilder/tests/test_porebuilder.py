@@ -29,3 +29,10 @@ class TestPoreBuilder(BaseTest):
             assert gph_pore_solv.n_particles == 5016
         elif gph_pore_nosolv:
             assert gph_pore_nosolv.n_particles == 2016
+    
+    def test_particles_in_box(self, gph_pore_solv):
+        for position in gph_pore_solv.xyz:
+            for x in range(3):
+                assert position[x] < gph_pore_solv.periodicity[x]
+                assert position[x] >= 0.0 # May have to change this test
+
