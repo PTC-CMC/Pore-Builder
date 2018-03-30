@@ -8,7 +8,8 @@ class TestPoreBuilder(BaseTest):
     Unit Tests for Pore class functionality.
     """
 
-    def test_save(self, gph_pore_solv):
+    def test_save(self, gph_pore_nosolv, gph_pore_solv):
+        gph_pore_nosolv.save(filename='gph_pore_nosolv.gro')
         gph_pore_solv.save(filename='gph_pore.gro')
 
     def test_porewidth(self, gph_pore_solv):
@@ -18,12 +19,13 @@ class TestPoreBuilder(BaseTest):
         np.testing.assert_almost_equal(pore_width, 1, 4)
 
     def test_sheet_dims(self, gph_pore_solv):
-        x_length = np.max(gph_pore_solv.bot_xyz[:,0]) - np.min(gph_pore_solv.bot_xyz[:,0])
+        x_length = np.max(gph_pore_solv.bot_xyz[:,0]) 
+        - np.min(gph_pore_solv.bot_xyz[:,0])
         assert x_length == pytest.approx(3, 0.5)
-        y_length = np.max(gph_pore_solv.bot_xyz[:,2]) - np.min(gph_pore_solv.bot_xyz[:,2])
+        y_length = np.max(gph_pore_solv.bot_xyz[:,2])
+        - np.min(gph_pore_solv.bot_xyz[:,2])
         assert y_length == pytest.approx(3, 0.5)
     
-    #@pytest.mark.parametrize('system', [gph_pore_solv,gph_pore_nosolv])
     def test_n_particles(self, gph_pore_solv, gph_pore_nosolv):
         if gph_pore_solv:
             assert gph_pore_solv.n_particles == 5016
@@ -36,3 +38,8 @@ class TestPoreBuilder(BaseTest):
                 assert position[x] < gph_pore_solv.periodicity[x]
                 assert position[x] >= 0.0 # May have to change this test
 
+    # TODO: Get correct x-dimension of graphene sheet
+    """def test_x_bulk_length(self, gph_pore_solv):
+        gph_length = np.max(gph_pore_solv.bot_xyz[0])
+        np.min(gph_pore_solv.bot_xyz[0])
+        assert (gph_pore_solv.periodicity[0] - gph_length)/2 == # need value"""
