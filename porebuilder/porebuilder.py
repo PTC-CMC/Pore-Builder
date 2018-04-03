@@ -81,14 +81,21 @@ class Pores(mb.Compound):
         """Solvate slit pore box
         Parameters
         ----------
-        solvent: dictionary
-            Compound and residue name to load into system {'name': compound}
+        solvent: compatible file 
         n_solvent: int
             Number of compounds to solvate with
         """
-        for key, value in solvent.items():
-            fluid = mb.load(value)
-            fluid.name = key
+        if len(solvent) == 1:
+            fluid = mb.load(solvent)
+            fluid.name = '{}'.format(solvent)
+        elif len(solvent) == 2:
+            fluid_1 = mb.load(solvent[0])
+            fluid_1.name = '{}'.format(solvent[0])
+            fluid_2 = mb.load(solvent[1])
+            fluid_2.name = '{}'.format(solvent[1])
+            fluid = [fluid_1, fluid_2]
+        elif len(solvent) > 2:
+            raise ValueError('"gph_pore_solv" class currently only supports a maximum of 2 solvents')
         box = [(self.x_bulk*2)+self.graphene_dims[0]+.5,
                 self.pore_width+(2*(self.graphene_dims[2]-0.335)+.5),
                 self.graphene_dims[1]]
