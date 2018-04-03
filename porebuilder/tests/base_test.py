@@ -15,13 +15,13 @@ class BaseTest:
 
     @pytest.fixture
     def gph_pore_nosolv(self):
-        from porebuilder.porebuilder import Pores
-        return Pores(x_sheet=3, y_sheet=3, sheets=3, pore_width=1,
+        from porebuilder.porebuilder import gph_pore
+        return gph_pore(x_sheet=3, y_sheet=3, sheets=3, pore_width=1,
                 x_bulk=3)
 
     @pytest.fixture
     def gph_pore_solv(self):
-        from porebuilder.porebuilder import Pores
+        from porebuilder.porebuilder import gph_pore_solv
         h2o = os.path.join(TESTFILE_DIR, 'tip3p.mol2')
-        return Pores(x_sheet=3, y_sheet=3, sheets=3, pore_width=1,
-                x_bulk=3, solvent={'SOL': h2o}, n_solvent=1000)
+        return gph_pore_solv(x_sheet=3, y_sheet=3, sheets=3, pore_width=1,
+                x_bulk=3, solvent=h2o, n_solvent=[1000])
