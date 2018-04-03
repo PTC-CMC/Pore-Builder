@@ -1,15 +1,35 @@
-from porebuilder.porebuilder import Pores
+from porebuilder import gph_pore_solv
 import mbuild as mb
 import foyer
 from foyer import Forcefield
+import parmed as pmd
 
 water = '/Users/raymatsumoto/science/il_solvent_local/file_gen/mol2/tip3p.mol2'
-system = Pores(x_sheet=4, y_sheet=4, sheets=3, pore_width=1.2,
-        x_bulk=3, solvent={'SOL': water}, n_solvent=2500)
-ff = 'C-spce.xml'
-ff = Forcefield(ff)
-system = ff.apply(system.to_parmed(residues=['RES', 'SOL']))
+ch3cn = '/Users/raymatsumoto/science/il_solvent_local/file_gen/mol2/ch3cn.mol2'
+system = gph_pore_solv(x_sheet=4, y_sheet=4, sheets=3, pore_width=1.2,
+        x_bulk=3, solvent=[{'SOL': water}, {'ch3cn':ch3cn}], n_solvent=[1000,300])
+C_spce = 'C-spce.xml'
+C_spce = Forcefield(C_spce)
+opls = Forcefield(name='oplsaa')
 
-system.save('init.gro', overwrite=True)
-print('atomtyping...')
-system.save('init.top', overwrite=True, combine='all')
+box = mb.Box(system.box)
+totalPM = pmd.Structure()
+for child in system.children:
+    if child.name in 'Compound':
+        totalPM += child.to_parmed(residues='Compound', box=box)
+    elif child.name in system.fluid_2_name:
+        totalPM += child.to_parmed(residues='ch3cn', box=box)
+    elif child.name in system.fluid_1_name:
+        totalPM += child.to_parmed(residues='SOL', box =box)
+
+ch3cnPM = totalPM['ch3cn',:]
+SOLPM = totalPM['SOL',:]
+gphPM = totalPM['Compound',:]
+
+SOLPM = C_spce.apply(SOLPM, residues='SOL')
+gphPM = C_spce.apply(gphPM, residues='Compound')
+ch3cnPM = opls.apply(ch3cnPM, residues='ch3cn')
+
+systemPM = SOLPM + gphPM + ch3cnPM 
+systemPM.save('init.gro', overwrite=True)
+systemPM.save('init.top', overwrite=True)

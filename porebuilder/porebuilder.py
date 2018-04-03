@@ -25,15 +25,14 @@ class gph_pore_solv(mb.Compound):
         width of slit pore [nm]
     x_bulk: int
         length of bulk region in x-direction [nm]
-    solvent: compatible molecule file, array(up to 2)
-        compound to solvate the system with.  
+    solvent: dict or an array of 2 dicts (Do not currently support more than 2 solvents)
+        compound(s) to solvate the system with.  
     n_solvent: int
         number of solvents to solvate the system with. Array must
         match size of 'solvent'
     Attributes
     ----------
     
-    Notes: Match graphene y-dimension with box x-dimension
     """
     def __init__(self,x_sheet, y_sheet, sheets, pore_width, x_bulk,
             solvent, n_solvent):
@@ -72,14 +71,17 @@ class gph_pore_solv(mb.Compound):
         self.top_xyz = top_sheet.xyz
         system = mb.Compound()
         system.from_parmed(structure=bottom_sheet.to_parmed() + top_sheet.to_parmed())
-        if isinstance(solvent,str):
-            fluid = mb.load(solvent)
-            fluid.name = '{}'.format(solvent)
+        if len(solvent) == 1:
+            for key, value in solvent.items():
+                fluid = mb.load(value)
+                fluid.name = key
         elif len(solvent) == 2:
-            fluid_1 = mb.load(solvent[0])
-            fluid_1.name = '{}'.format(solvent[0])
-            fluid_2 = mb.load(solvent[1])
-            fluid_2.name = '{}'.format(solvent[1])
+            for key, value in solvent[0].items():
+                fluid_1 = mb.load(value)
+                fluid_1.name = key
+            for key, value in solvent[1].items():
+                fluid_2 = mb.load(value)
+                fluid_2.name = key
             fluid = [fluid_1, fluid_2]
         elif len(solvent) > 2:
             raise ValueError('"gph_pore_solv" class currently only supports a maximum of 2 solvents')
@@ -88,7 +90,24 @@ class gph_pore_solv(mb.Compound):
                 self.graphene_dims[1]]
         system = mb.solvate(system, fluid, n_solvent, box=box, overlap=0.2)
         system.periodicity = box
-        self.add(system)
+        self.box = system.periodicity
+
+        if len(solvent) == 1:
+            for child in system.children:
+                if child.name in fluid.name:
+                    self.add(mb.clone(child))
+                elif child.name in 'Compound':
+                    self.add(mb.clone(child))
+        elif len(solvent) == 2:
+            for child in system.children:
+                if child.name in fluid[0].name:
+                    self.add(mb.clone(child))
+                    self.fluid_1_name = fluid[0].name
+                elif child.name in fluid[1].name:
+                    self.add(mb.clone(child))  
+                    self.fluid_2_name = fluid[1].name
+                elif child.name in 'Compound':
+                    self.add(mb.clone(child))
 
 class gph_pore(mb.Compound):
     """A general slit pore recipe.  Does not solvate system.  Use
