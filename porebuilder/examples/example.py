@@ -1,5 +1,6 @@
 from porebuilder import gph_pore_solv
 import mbuild as mb
+import numpy as np
 import foyer
 from foyer import Forcefield
 import parmed as pmd
@@ -31,5 +32,8 @@ gphPM = C_spce.apply(gphPM, residues='Compound')
 ch3cnPM = opls.apply(ch3cnPM, residues='ch3cn')
 
 systemPM = SOLPM + gphPM + ch3cnPM 
+systemPM.box = np.empty(6)
+systemPM.box[:3] = box.maxs * 10 # convert from nm to angstroms
+systemPM.box[3:7] = 90
 systemPM.save('init.gro', overwrite=True)
 systemPM.save('init.top', overwrite=True)
