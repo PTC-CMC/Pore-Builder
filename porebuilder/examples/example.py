@@ -18,14 +18,15 @@ totalPM = pmd.Structure()
 for child in system.children:
     if child.name in 'Compound':
         totalPM += child.to_parmed(residues='Compound', box=box)
-    elif child.name in system.fluid_2_name:
+    elif child.name in system.fluid_name[1]:
         totalPM += child.to_parmed(residues='ch3cn', box=box)
-    elif child.name in system.fluid_1_name:
+    elif child.name in system.fluid_name[0]:
         totalPM += child.to_parmed(residues='SOL', box =box)
 
 ch3cnPM = totalPM['ch3cn',:]
 SOLPM = totalPM['SOL',:]
 gphPM = totalPM['Compound',:]
+import pdb; pdb.set_trace()
 
 SOLPM = C_spce.apply(SOLPM, residues='SOL')
 gphPM = C_spce.apply(gphPM, residues='Compound')

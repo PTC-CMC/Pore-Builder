@@ -75,7 +75,7 @@ class gph_pore_solv(mb.Compound):
             for key, value in solvent.items():
                 fluid = mb.load(value)
                 fluid.name = key
-        elif len(solvent) == 2:
+        elif len(solvent) in [2,3]:
             for key, value in solvent[0].items():
                 fluid_1 = mb.load(value)
                 fluid_1.name = key
@@ -83,7 +83,12 @@ class gph_pore_solv(mb.Compound):
                 fluid_2 = mb.load(value)
                 fluid_2.name = key
             fluid = [fluid_1, fluid_2]
-        elif len(solvent) > 2:
+            if len(solvent) == 3:
+                for key,value in solvent[2].items():
+                    fluid_3 = mb.load(value)
+                    fluid_3.name = key
+                    fluid.append(fluid_3)
+        elif len(solvent) > 3:
             raise ValueError('"gph_pore_solv" class currently only supports a maximum of 2 solvents')
         box = [(self.x_bulk*2)+self.graphene_dims[0]+.5,
                 self.pore_width+(2*(self.graphene_dims[2]-0.335)+.5),
@@ -99,16 +104,21 @@ class gph_pore_solv(mb.Compound):
                     self.fluid_name = fluid.name
                 elif child.name in 'Compound':
                     self.add(mb.clone(child))
-        elif len(solvent) == 2:
+        elif len(solvent) in [2,3]:
+            self.fluid_name = [0 for x in range(2)]
             for child in system.children:
                 if child.name in fluid[0].name:
                     self.add(mb.clone(child))
-                    self.fluid_1_name = fluid[0].name
+                    self.fluid_name[0] = fluid[0].name
                 elif child.name in fluid[1].name:
                     self.add(mb.clone(child))  
-                    self.fluid_2_name = fluid[1].name
+                    self.fluid_name[1] = fluid[1].name
                 elif child.name in 'Compound':
                     self.add(mb.clone(child))
+                if len(solvent) == 3:
+                    if child.name in fluid[2].name:
+                        self.add(mb.clone(child))
+                        self.fluid_name.append(fluid[2].name)
 
 class gph_pore(mb.Compound):
     """A general slit pore recipe.  Does not solvate system.  Use
