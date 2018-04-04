@@ -96,6 +96,7 @@ class gph_pore_solv(mb.Compound):
             for child in system.children:
                 if child.name in fluid.name:
                     self.add(mb.clone(child))
+                    self.fluid_name = fluid.name
                 elif child.name in 'Compound':
                     self.add(mb.clone(child))
         elif len(solvent) == 2:

@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import mbuild as mb
+import parmed as pmd
 from base_test import BaseTest
 
 class TestPoreBuilder(BaseTest):
@@ -33,9 +34,22 @@ class TestPoreBuilder(BaseTest):
             assert gph_pore_nosolv.n_particles == 2016
     
     def test_particles_in_box(self, gph_pore_solv):
+        box = mb.Box(gph_pore_solv.box)
+        totalPM = pmd.Structure()
+        for child in gph_pore_solv.children:
+            if child.name in 'Compound':
+                totalPM += child.to_parmed(residues='Compound', box=box)
+            elif child.name in gph_pore_solv.fluid_name:
+                totalPM += child.to_parmed(residues='SOL', box=box)
+        gphPM = totalPM['Compound',:]
+        SOLPM = totalPM['SOL', :]
+        systemPM = gphPM + SOLPM
+        systemPM.box = np.empty(6)
+        systemPM.box[:3] = box.maxs * 10 
+        systemPM.box[3:7] = 90
         for position in gph_pore_solv.xyz:
             for x in range(3):
-                assert position[x] < gph_pore_solv.periodicity[x]
+                assert position[x] < systemPM.box[x]
                 assert position[x] >= 0.0 # May have to change this test
 
     # TODO: Get correct x-dimension of graphene sheet
