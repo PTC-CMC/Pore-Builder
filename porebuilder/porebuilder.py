@@ -8,10 +8,10 @@ from mbuild import clone
 from copy import deepcopy
 import math
 
-__all__ = ['gph_pore_solv', 'gph_pore']
+__all__ = ['GraphenePoreSolvent', 'GraphenePore']
 
 
-class gph_pore_solv(mb.Compound):
+class GraphenePoreSolvent(mb.Compound):
     """A general slit pore recipe that solvates the system
 
     Parameters
@@ -38,7 +38,7 @@ class gph_pore_solv(mb.Compound):
     """
     def __init__(self, x_sheet, y_sheet, sheets, pore_width, x_bulk,
             solvent, n_solvent):
-        super(gph_pore_solv, self).__init__()
+        super(GraphenePoreSolvent, self).__init__()
         self.x_sheet = x_sheet
         self.y_sheet = y_sheet
         self.sheets = sheets
@@ -96,7 +96,7 @@ class gph_pore_solv(mb.Compound):
                     fluid_3.name = key
                     fluid.append(fluid_3)
         elif len(solvent) > 3:
-            msg = '"gph_pore_solv" class currently only supports a maximum of 2 solvents'
+            msg = '"GraphenePoreSolvent" class currently only supports a maximum of 2 solvents'
             raise ValueError(msg)
 
         box = [(self.x_bulk*2)+self.graphene_dims[0]+.5,
@@ -130,9 +130,9 @@ class gph_pore_solv(mb.Compound):
                         self.fluid_name.append(fluid[2].name)
 
 
-class gph_pore(mb.Compound):
+class GraphenePore(mb.Compound):
     """A general slit pore recipe.  Does not solvate system.  Use
-    'gph_pore_solv' instead if you wish to solvate your system.
+    'GraphenePoreSolvent' instead if you wish to solvate your system.
 
     Parameters
     ----------
@@ -152,7 +152,7 @@ class gph_pore(mb.Compound):
     Notes: Match graphene y-dimension with box x-dimension
     """
     def __init__(self, x_sheet, y_sheet, sheets, pore_width, x_bulk):
-        super(gph_pore, self).__init__()
+        super(GraphenePore, self).__init__()
         self.x_sheet = x_sheet
         self.y_sheet = y_sheet
         self.sheets = sheets
