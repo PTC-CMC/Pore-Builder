@@ -9,7 +9,7 @@ water = 'files/tip3p.mol2'
 acn = 'files/acn.mol2'
 
 system = GraphenePoreSolvent(x_sheet=4, y_sheet=4, sheets=3, pore_width=1.2,
-        x_bulk=3, solvent=[{'SOL': water}, {'acn':acn}], n_solvent=[1000,300])
+        x_bulk=3, solvent=[{'SOL': water}, {'acn':acn}], n_solvent=[10,3])
 
 C_spce = Forcefield('files/C-spce.xml')
 opls = Forcefield(name='oplsaa')
@@ -27,7 +27,6 @@ for child in system.children:
 acnPM = totalPM['acn',:]
 SOLPM = totalPM['SOL',:]
 gphPM = totalPM['Compound',:]
-import pdb; pdb.set_trace()
 
 SOLPM = C_spce.apply(SOLPM, residues='SOL')
 gphPM = C_spce.apply(gphPM, residues='Compound')
