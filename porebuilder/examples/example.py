@@ -8,33 +8,35 @@ import parmed as pmd
 water = 'files/tip3p.mol2'
 acn = 'files/acn.mol2'
 
-system = GraphenePoreSolvent(x_sheet=4, y_sheet=4, sheets=3, pore_width=1.2,
-        x_bulk=3, solvent=[{'SOL': water}, {'acn':acn}], n_solvent=[10,3])
-
 C_spce = Forcefield('files/C-spce.xml')
 opls = Forcefield(name='oplsaa')
 
+system = GraphenePoreSolvent(x_sheet=4, y_sheet=4, sheets=3, pore_width=1.2,
+        x_bulk=3, solvent=[{'SOL': water}, {'acn':acn}], n_solvent=[10,3])
+
+
 box = mb.Box(system.box)
-totalPM = pmd.Structure()
+system_pmd = pmd.Structure()
+
 for child in system.children:
     if child.name in 'Compound':
-        totalPM += child.to_parmed(residues='Compound', box=box)
+        system_pmd += child.to_parmed(residues='Compound', box=box)
     elif child.name in system.fluid_name[1]:
-        totalPM += child.to_parmed(residues='acn', box=box)
+        system_pmd += child.to_parmed(residues='acn', box=box)
     elif child.name in system.fluid_name[0]:
-        totalPM += child.to_parmed(residues='SOL', box =box)
+        system_pmd += child.to_parmed(residues='SOL', box =box)
 
-acnPM = totalPM['acn',:]
-SOLPM = totalPM['SOL',:]
-gphPM = totalPM['Compound',:]
+acn_pmd = system_pmd['acn',:]
+SOL_pmd = system_pmd['SOL',:]
+gph_pmd = system_pmd['Compound',:]
 
-SOLPM = C_spce.apply(SOLPM, residues='SOL')
-gphPM = C_spce.apply(gphPM, residues='Compound')
-acnPM = opls.apply(acnPM, residues='acn')
+SOL_pmd = C_spce.apply(SOL_pmd, residues='SOL')
+gph_pmd = C_spce.apply(gph_pmd, residues='Compound')
+acn_pmd = opls.apply(acn_pmd, residues='acn')
 
-systemPM = SOLPM + gphPM + acnPM
-systemPM.box = np.empty(6)
-systemPM.box[:3] = box.maxs * 10 # convert from nm to angstroms
-systemPM.box[3:7] = 90
-systemPM.save('init.gro', overwrite=True)
-systemPM.save('init.top', overwrite=True)
+system_pmd = SOL_pmd + gph_pmd + acn_pmd
+system_pmd.box = np.empty(6)
+system_pmd.box[:3] = box.maxs * 10 # convert from nm to angstroms
+system_pmd.box[3:7] = 90
+system_pmd.save('init.gro', overwrite=True)
+system_pmd.save('init.top', overwrite=True)
