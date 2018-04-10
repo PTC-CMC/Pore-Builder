@@ -45,39 +45,10 @@ class GraphenePoreSolvent(mb.Compound):
         self.pore_width = pore_width
         self.x_bulk = x_bulk
 
-        # Do some math to figure out how much to replicate graphene cell.
-        # Multiply replicate[1] by 15/13 to take into account later
-        # multiplication
-        # TODO: Figure out if rounding is necessary
-        factor = np.cos(math.pi/6)
-        replicate = [(self.x_sheet/0.2456),
-                (self.y_sheet/0.2456)*(1/factor)]
-        if all(x <= 0 for x in [x_sheet, y_sheet]):
-            msg = 'Dimension of graphene sheet must be greater than zero'
-            raise ValueError(msg)
-        self.name = 'C'
-        carbon_locations = [[0, 0, 0], [2/3, 1/3, 0]]
-        basis = {self.name: carbon_locations}
-        graphene_lattice = mb.Lattice(lattice_spacing=[0.2456, 0.2456, 0.335],
-                                      angles=[90, 90, 120], lattice_points=basis)
-        carbon = mb.Compound(name=self.name)
-        graphene = graphene_lattice.populate(compound_dict={self.name: carbon},
-                                             x=replicate[0], y=replicate[1],
-                                             z=self.sheets)
-        for particle in graphene.particles():
-            if particle.xyz[0][0] < 0:
-                particle.xyz[0][0] += graphene.periodicity[0]
-        self.graphene_dims = graphene.periodicity
-        self.graphene_dims[1] *= factor  # cos(30)*.246
-        bottom_sheet = mb.clone(graphene)
-        bottom_sheet.translate([0, self.pore_width + (self.graphene_dims[2] - 0.335), 0])
-        bottom_sheet.spin(1.5708, [1, 0, 0])
-        top_sheet = mb.clone(graphene)
-        top_sheet.spin(1.5708, [1, 0, 0])
-        self.bot_xyz = bottom_sheet.xyz
-        self.top_xyz = top_sheet.xyz
-        system = mb.Compound()
-        system.from_parmed(structure=bottom_sheet.to_parmed() + top_sheet.to_parmed())
+        system = GraphenePore(x_sheet=self.x_sheet, y_sheet=self.y_sheet,
+                              sheets=self.sheets, pore_width=self.pore_width,
+                              x_bulk=self.x_bulk)
+
         if len(solvent) == 1:
             for key, value in solvent.items():
                 fluid = value
