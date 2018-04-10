@@ -80,19 +80,19 @@ class GraphenePoreSolvent(mb.Compound):
         system.from_parmed(structure=bottom_sheet.to_parmed() + top_sheet.to_parmed())
         if len(solvent) == 1:
             for key, value in solvent.items():
-                fluid = mb.load(value)
+                fluid = value
                 fluid.name = key
         elif len(solvent) in [2, 3]:
             for key, value in solvent[0].items():
-                fluid_1 = mb.load(value)
+                fluid_1 = value
                 fluid_1.name = key
             for key, value in solvent[1].items():
-                fluid_2 = mb.load(value)
+                fluid_2 = value
                 fluid_2.name = key
             fluid = [fluid_1, fluid_2]
             if len(solvent) == 3:
                 for key, value in solvent[2].items():
-                    fluid_3 = mb.load(value)
+                    fluid_3 = value
                     fluid_3.name = key
                     fluid.append(fluid_3)
         elif len(solvent) > 3:

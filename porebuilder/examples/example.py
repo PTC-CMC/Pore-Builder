@@ -5,14 +5,14 @@ import foyer
 from foyer import Forcefield
 import parmed as pmd
 
-water = 'files/tip3p.mol2'
-acn = 'files/acn.mol2'
+water = mb.load('files/tip3p.mol2')
+acn = mb.load('files/acn.mol2')
 
 C_spce = Forcefield('files/C-spce.xml')
 opls = Forcefield(name='oplsaa')
 
 system = GraphenePoreSolvent(x_sheet=4, y_sheet=4, sheets=3, pore_width=1.2,
-        x_bulk=3, solvent=[{'SOL': water}, {'acn':acn}], n_solvent=[10,3])
+        x_bulk=3, solvent=[{'SOL': water}, {'acn':acn}], n_solvent=[1000,300])
 
 
 box = mb.Box(system.box)
