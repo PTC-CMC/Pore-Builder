@@ -39,67 +39,17 @@ class GraphenePoreSolvent(mb.Compound):
     def __init__(self, x_sheet, y_sheet, sheets, pore_width, x_bulk,
             solvent, n_solvent):
         super(GraphenePoreSolvent, self).__init__()
-        self.x_sheet = x_sheet
-        self.y_sheet = y_sheet
-        self.sheets = sheets
-        self.pore_width = pore_width
-        self.x_bulk = x_bulk
 
-        system = GraphenePore(x_sheet=self.x_sheet, y_sheet=self.y_sheet,
-                              sheets=self.sheets, pore_width=self.pore_width,
-                              x_bulk=self.x_bulk)
+        system = GraphenePore(x_sheet=x_sheet, y_sheet=y_sheet,
+                              sheets=sheets, pore_width=pore_width)
 
-        if len(solvent) == 1:
-            for key, value in solvent.items():
-                fluid = value
-                fluid.name = key
-        elif len(solvent) in [2, 3]:
-            for key, value in solvent[0].items():
-                fluid_1 = value
-                fluid_1.name = key
-            for key, value in solvent[1].items():
-                fluid_2 = value
-                fluid_2.name = key
-            fluid = [fluid_1, fluid_2]
-            if len(solvent) == 3:
-                for key, value in solvent[2].items():
-                    fluid_3 = value
-                    fluid_3.name = key
-                    fluid.append(fluid_3)
-        elif len(solvent) > 3:
-            msg = '"GraphenePoreSolvent" class currently only supports a maximum of 2 solvents'
-            raise ValueError(msg)
+        system.periodicity[2] += 2 * x_bulk
+        box = mb.Box(system.periodicity)
 
-        box = [(self.x_bulk*2)+self.graphene_dims[0]+.5,
-                self.pore_width+(2 * (self.graphene_dims[2] - 0.335) + 0.5),
-                self.graphene_dims[1]]
-        system = mb.solvate(system, fluid, n_solvent, box=box, overlap=0.2)
-        system.periodicity = box
-        self.box = system.periodicity
+        system = mb.solvate(system, solvent, n_solvent, box=box, overlap=0.2)
 
-        if len(solvent) == 1:
-            for child in system.children:
-                if child.name in fluid.name:
-                    self.add(mb.clone(child))
-                    self.fluid_name = fluid.name
-                elif child.name in 'Compound':
-                    self.add(mb.clone(child))
-        elif len(solvent) in [2, 3]:
-            self.fluid_name = [0 for x in range(2)]
-            for child in system.children:
-                if child.name in fluid[0].name:
-                    self.add(mb.clone(child))
-                    self.fluid_name[0] = fluid[0].name
-                elif child.name in fluid[1].name:
-                    self.add(mb.clone(child))
-                    self.fluid_name[1] = fluid[1].name
-                elif child.name in 'Compound':
-                    self.add(mb.clone(child))
-                if len(solvent) == 3:
-                    if child.name in fluid[2].name:
-                        self.add(mb.clone(child))
-                        self.fluid_name.append(fluid[2].name)
-
+        for child in system.children:
+            self.add(clone(child))
 
 class GraphenePore(mb.Compound):
     """A general slit pore recipe.  Does not solvate system.  Use
@@ -122,7 +72,7 @@ class GraphenePore(mb.Compound):
 
     Notes: Match graphene y-dimension with box x-dimension
     """
-    def __init__(self, x_sheet, y_sheet, sheets, pore_width, x_bulk):
+    def __init__(self, x_sheet, y_sheet, sheets, pore_width):
         super(GraphenePore, self).__init__()
 
         # Do some math to figure out how much to replicate graphene cell.
@@ -154,6 +104,4 @@ class GraphenePore(mb.Compound):
         bottom_sheet.spin(1.5708, [1, 0, 0])
         top_sheet = mb.clone(graphene)
         top_sheet.spin(1.5708, [1, 0, 0])
-        bot_xyz = bottom_sheet.xyz
-        top_xyz = top_sheet.xyz
-        self.from_parmed(bottom_sheet.to_parmed() + top_sheet.to_parmed()
+        self.from_parmed(bottom_sheet.to_parmed() + top_sheet.to_parmed())
