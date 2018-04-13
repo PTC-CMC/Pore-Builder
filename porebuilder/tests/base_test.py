@@ -14,14 +14,14 @@ class BaseTest:
         tmpdir.chdir()
 
     @pytest.fixture
-    def GraphenePore_nosolv(self):
+    def GraphenePore(self):
         from porebuilder.porebuilder import GraphenePore
-        return GraphenePore(x_sheet=3, y_sheet=3, sheets=3, pore_width=1,
-                x_bulk=3)
+        return GraphenePore(x_sheet=3, y_sheet=3, sheets=3, pore_width=1)
 
     @pytest.fixture
     def GraphenePoreSolvent(self):
         from porebuilder.porebuilder import GraphenePoreSolvent
         h2o = mb.load(os.path.join(TESTFILE_DIR, 'tip3p.mol2'))
+        h2o.name = 'SOL'
         return GraphenePoreSolvent(x_sheet=3, y_sheet=3, sheets=3, pore_width=1,
-                x_bulk=3, solvent={'SOL': h2o}, n_solvent=1000)
+                x_bulk=3, solvent=[h2o], n_solvent=1000)
