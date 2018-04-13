@@ -9,9 +9,12 @@ class TestPoreBuilder(BaseTest):
     Unit Tests for Pore class functionality.
     """
 
-    def test_save(self, GraphenePore_nosolv, GraphenePoreSolvent):
-        GraphenePore_nosolv.save(filename='GraphenePore_nosolv.gro')
-        GraphenePoreSolvent.save(filename='GraphenePore.gro')
+    def test_save_dry(self, GraphenePore):
+        GraphenePore.save(filename='dry_pore.gro')
+
+    def test_save_solvated(self, GraphenePoreSolvent):
+        GraphenePoreSolvent.save(filename='solvated_pore.gro')
+
 
     def test_porewidth(self, GraphenePoreSolvent):
         bot = np.min(GraphenePoreSolvent.bot_xyz[:,1])
