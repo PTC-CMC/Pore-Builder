@@ -102,6 +102,9 @@ class GraphenePore(mb.Compound):
         bottom_sheet = mb.clone(graphene)
         bottom_sheet.translate([0, pore_width + (graphene_dims[2] - 0.335), 0])
         bottom_sheet.spin(1.5708, [1, 0, 0])
+        bottom_sheet.name = 'BOT'
         top_sheet = mb.clone(graphene)
         top_sheet.spin(1.5708, [1, 0, 0])
-        self.from_parmed(bottom_sheet.to_parmed() + top_sheet.to_parmed())
+        top_sheet.name = 'TOP'
+        self.add(top_sheet)
+        self.add(bottom_sheet)
