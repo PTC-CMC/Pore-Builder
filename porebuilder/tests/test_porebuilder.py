@@ -20,6 +20,7 @@ class TestPoreBuilder(BaseTest):
 
     def test_hierarchy_solvated(self, GraphenePoreSolvent):
         assert len(GraphenePoreSolvent.children) == 11
+        assert [len(c.children) for c in GraphenePoreSolvent.children] == [2] + 10 * [3]
 
     def test_porewidth(self, GraphenePoreSolvent):
         bot = np.min(GraphenePoreSolvent.bot_xyz[:,1])
