@@ -15,6 +15,11 @@ class TestPoreBuilder(BaseTest):
     def test_save_solvated(self, GraphenePoreSolvent):
         GraphenePoreSolvent.save(filename='solvated_pore.gro')
 
+    def test_hierarchy_dry(self, GraphenePore):
+        assert len(GraphenePore.children) == 2
+
+    def test_hierarchy_solvated(self, GraphenePoreSolvent):
+        assert len(GraphenePoreSolvent.children) == 11
 
     def test_porewidth(self, GraphenePoreSolvent):
         bot = np.min(GraphenePoreSolvent.bot_xyz[:,1])
@@ -30,11 +35,11 @@ class TestPoreBuilder(BaseTest):
         - np.min(GraphenePoreSolvent.bot_xyz[:,2])
         assert y_length == pytest.approx(3, 0.5)
     
-    def test_n_particles(self, GraphenePoreSolvent, GraphenePore_nosolv):
+    def test_n_particles(self, GraphenePoreSolvent, GraphenePore):
         if GraphenePoreSolvent:
             assert GraphenePoreSolvent.n_particles == 5016
-        elif GraphenePore_nosolv:
-            assert GraphenePore_nosolv.n_particles == 2016
+        elif GraphenePore:
+            assert GraphenePore.n_particles == 2016
     
     def test_particles_in_box(self, GraphenePoreSolvent):
         box = mb.Box(GraphenePoreSolvent.box)
