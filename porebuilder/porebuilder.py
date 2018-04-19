@@ -99,11 +99,11 @@ class GraphenePore(mb.Compound):
                 particle.xyz[0][0] += graphene.periodicity[0]
         graphene.periodicity[1] *= factor  # cos(30)*.246
         bottom_sheet = mb.clone(graphene)
-        bottom_sheet.translate([0, pore_width + (graphene.periodicity[2] - 0.335), 0])
         bottom_sheet.spin(1.5708, [1, 0, 0])
         bottom_sheet.name = 'BOT'
         top_sheet = mb.clone(graphene)
         top_sheet.spin(1.5708, [1, 0, 0])
+        top_sheet.translate([0, pore_width + (graphene.periodicity[2] - 0.335), 0])
         top_sheet.name = 'TOP'
         self.add(top_sheet)
         self.add(bottom_sheet)
