@@ -22,11 +22,12 @@ class TestPoreBuilder(BaseTest):
         assert len(GraphenePoreSolvent.children) == 11
         assert [len(c.children) for c in GraphenePoreSolvent.children] == [2] + 10 * [3]
 
-    def test_porewidth(self, GraphenePoreSolvent):
-        bot = np.min(GraphenePoreSolvent.bot_xyz[:,1])
-        top = np.max(GraphenePoreSolvent.top_xyz[:,1]) # change naming
-        pore_width = bot - top
-        np.testing.assert_almost_equal(pore_width, 1, 4)
+    def test_porewidth(self, GraphenePore):
+        bot = next(c for c in GraphenePore.children if c.name == 'BOT')
+        top = next(c for c in GraphenePore.children if c.name == 'TOP')
+        bot_y = np.max(bot.xyz[:, 1])
+        top_y = np.min(top.xyz[:, 1])
+        assert np.isclose(top_y - bot_y, 1.0, 3)
 
     def test_sheet_dims(self, GraphenePoreSolvent):
         x_length = np.max(GraphenePoreSolvent.bot_xyz[:,0])
