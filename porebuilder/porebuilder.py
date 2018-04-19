@@ -97,10 +97,9 @@ class GraphenePore(mb.Compound):
         for particle in graphene.particles():
             if particle.xyz[0][0] < 0:
                 particle.xyz[0][0] += graphene.periodicity[0]
-        graphene_dims = graphene.periodicity
-        graphene_dims[1] *= factor  # cos(30)*.246
+        graphene.periodicity[1] *= factor  # cos(30)*.246
         bottom_sheet = mb.clone(graphene)
-        bottom_sheet.translate([0, pore_width + (graphene_dims[2] - 0.335), 0])
+        bottom_sheet.translate([0, pore_width + (graphene.periodicity[2] - 0.335), 0])
         bottom_sheet.spin(1.5708, [1, 0, 0])
         bottom_sheet.name = 'BOT'
         top_sheet = mb.clone(graphene)
@@ -108,3 +107,7 @@ class GraphenePore(mb.Compound):
         top_sheet.name = 'TOP'
         self.add(top_sheet)
         self.add(bottom_sheet)
+        self.periodicity[0] = graphene.periodicity[0]
+        self.periodicity[1] = graphene.periodicity[2] + pore_width + 0.335
+        self.periodicity[2] = graphene.periodicity[1]
+        self.xyz -= np.min(self.xyz, axis=0)
