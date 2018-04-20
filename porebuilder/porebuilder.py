@@ -40,16 +40,19 @@ class GraphenePoreSolvent(mb.Compound):
             solvent, n_solvent):
         super(GraphenePoreSolvent, self).__init__()
 
-        system = GraphenePore(x_sheet=x_sheet, y_sheet=y_sheet,
+        pore = GraphenePore(x_sheet=x_sheet, y_sheet=y_sheet,
                               sheets=sheets, pore_width=pore_width)
 
-        system.periodicity[2] += 2 * x_bulk
-        box = mb.Box(system.periodicity)
+        box = mb.Box(pore.periodicity)
+        box.maxs[2] += 2 * x_bulk
 
-        system = mb.solvate(system, solvent, n_solvent, box=box, overlap=0.2)
+        system = mb.solvate(pore, solvent, n_solvent, box=box, overlap=0.2)
 
         for child in system.children:
             self.add(clone(child))
+
+        self.periodicity = box.maxs
+
 
 class GraphenePore(mb.Compound):
     """A general slit pore recipe.  Does not solvate system.  Use
@@ -108,6 +111,6 @@ class GraphenePore(mb.Compound):
         self.add(top_sheet)
         self.add(bottom_sheet)
         self.periodicity[0] = graphene.periodicity[0]
-        self.periodicity[1] = graphene.periodicity[2] + pore_width + 0.335
+        self.periodicity[1] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
         self.periodicity[2] = graphene.periodicity[1]
         self.xyz -= np.min(self.xyz, axis=0)
