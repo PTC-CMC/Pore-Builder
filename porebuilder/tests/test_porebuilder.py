@@ -29,14 +29,14 @@ class TestPoreBuilder(BaseTest):
         top_y = np.min(top.xyz[:, 1])
         assert np.isclose(top_y - bot_y, 1.0, 3)
 
-    def test_sheet_dims(self, GraphenePoreSolvent):
-        x_length = np.max(GraphenePoreSolvent.bot_xyz[:,0])
-        - np.min(GraphenePoreSolvent.bot_xyz[:,0])
-        assert x_length == pytest.approx(3, 0.5)
-        y_length = np.max(GraphenePoreSolvent.bot_xyz[:,2])
-        - np.min(GraphenePoreSolvent.bot_xyz[:,2])
-        assert y_length == pytest.approx(3, 0.5)
-    
+    def test_sheet_dims(self, GraphenePore):
+        bot = next(c for c in GraphenePore.children if c.name == 'BOT')
+        top = next(c for c in GraphenePore.children if c.name == 'TOP')
+        x_length = np.ptp(bot.xyz[:, 0])
+        y_length = np.ptp(bot.xyz[:, 1])
+        assert np.isclose(x_length, 3, 1)
+        assert np.isclose(y_length, 3, 1)
+
     def test_n_particles(self, GraphenePoreSolvent, GraphenePore):
         if GraphenePoreSolvent:
             assert GraphenePoreSolvent.n_particles == 5016
