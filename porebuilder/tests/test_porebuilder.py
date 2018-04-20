@@ -44,26 +44,9 @@ class TestPoreBuilder(BaseTest):
             assert GraphenePore.n_particles == 2016
     
     def test_particles_in_box(self, GraphenePoreSolvent):
-        box = mb.Box(GraphenePoreSolvent.box)
-        totalPM = pmd.Structure()
-        for child in GraphenePoreSolvent.children:
-            if child.name in 'Compound':
-                totalPM += child.to_parmed(residues='Compound', box=box)
-            elif child.name in GraphenePoreSolvent.fluid_name:
-                totalPM += child.to_parmed(residues='SOL', box=box)
-        gphPM = totalPM['Compound',:]
-        SOLPM = totalPM['SOL', :]
-        systemPM = gphPM + SOLPM
-        systemPM.box = np.empty(6)
-        systemPM.box[:3] = box.maxs * 10 
-        systemPM.box[3:7] = 90
-        for position in GraphenePoreSolvent.xyz:
-            for x in range(3):
-                assert position[x] < systemPM.box[x]
-                assert position[x] >= 0.0 # May have to change this test
+        box = mb.Box(GraphenePoreSolvent.periodicity)
 
-    # TODO: Get correct x-dimension of graphene sheet
-    """def test_x_bulk_length(self, GraphenePoreSolvent):
-        gph_length = np.max(GraphenePoreSolvent.bot_xyz[0])
-        np.min(GraphenePoreSolvent.bot_xyz[0])
-        assert (GraphenePoreSolvent.periodicity[0] - gph_length)/2 == # need value"""
+        for particle in GraphenePoreSolvent.particles():
+            assert particle.xyz[0][0] < box.maxs[0]
+            assert particle.xyz[0][1] < box.maxs[1]
+            assert particle.xyz[0][2] < box.maxs[2]
