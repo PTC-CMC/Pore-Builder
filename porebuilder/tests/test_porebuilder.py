@@ -39,7 +39,7 @@ class TestPoreBuilder(BaseTest):
 
     def test_n_particles(self, GraphenePoreSolvent, GraphenePore):
         if GraphenePoreSolvent:
-            assert GraphenePoreSolvent.n_particles == 5016
+            assert GraphenePoreSolvent.n_particles == 2046
         elif GraphenePore:
             assert GraphenePore.n_particles == 2016
     
