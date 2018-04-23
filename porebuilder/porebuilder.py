@@ -1,7 +1,5 @@
 import mbuild as mb
 import numpy as np
-from mbuild import clone
-import math
 
 __all__ = ['GraphenePoreSolvent', 'GraphenePore']
 
@@ -77,7 +75,7 @@ class GraphenePore(mb.Compound):
         # Multiply replicate[1] by 15/13 to take into account later
         # multiplication
         # TODO: Figure out if rounding is necessary
-        factor = np.cos(math.pi/6)
+        factor = np.cos(np.pi/6)
         replicate = [(x_sheet/0.2456),
                 (y_sheet/0.2456)*(1/factor)]
         if all(x <= 0 for x in [x_sheet, y_sheet]):
