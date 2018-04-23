@@ -1,7 +1,5 @@
-import numpy as np
 import pytest
 import mbuild as mb
-from mbuild.utils.geometry import calc_dihedral
 import os
 from pkg_resources import resource_filename
 

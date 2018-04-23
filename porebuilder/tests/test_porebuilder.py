@@ -1,7 +1,5 @@
 import numpy as np
-import pytest
 import mbuild as mb
-import parmed as pmd
 from porebuilder.tests.base_test import BaseTest
 
 class TestPoreBuilder(BaseTest):

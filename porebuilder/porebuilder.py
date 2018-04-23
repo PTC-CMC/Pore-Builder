@@ -1,11 +1,6 @@
-import itertools as it
 import mbuild as mb
 import numpy as np
-from mbuild.compound import Compound
-from mbuild.coordinate_transform import force_overlap
-from mbuild.utils.validation import assert_port_exists
 from mbuild import clone
-from copy import deepcopy
 import math
 
 __all__ = ['GraphenePoreSolvent', 'GraphenePore']
