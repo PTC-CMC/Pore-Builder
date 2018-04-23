@@ -42,7 +42,7 @@ class GraphenePoreSolvent(mb.Compound):
         system = mb.solvate(pore, solvent, n_solvent, box=box, overlap=0.2)
 
         for child in system.children:
-            self.add(clone(child))
+            self.add(mb.clone(child))
 
         self.periodicity = box.maxs
 
