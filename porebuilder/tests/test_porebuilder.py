@@ -2,6 +2,7 @@ import numpy as np
 import mbuild as mb
 from porebuilder.tests.base_test import BaseTest
 
+
 class TestPoreBuilder(BaseTest):
     """
     Unit Tests for Pore class functionality.
@@ -18,7 +19,8 @@ class TestPoreBuilder(BaseTest):
 
     def test_hierarchy_solvated(self, GraphenePoreSolvent):
         assert len(GraphenePoreSolvent.children) == 11
-        assert [len(c.children) for c in GraphenePoreSolvent.children] == [2] + 10 * [3]
+        lens = [2] + 10 * [3]
+        assert [len(c.children) for c in GraphenePoreSolvent.children] == lens
 
     def test_porewidth(self, GraphenePore):
         bot = next(c for c in GraphenePore.children if c.name == 'BOT')
@@ -40,7 +42,7 @@ class TestPoreBuilder(BaseTest):
             assert GraphenePoreSolvent.n_particles == 2046
         elif GraphenePore:
             assert GraphenePore.n_particles == 2016
-    
+
     def test_particles_in_box(self, GraphenePoreSolvent):
         box = mb.Box(GraphenePoreSolvent.periodicity)
 

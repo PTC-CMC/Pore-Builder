@@ -5,6 +5,7 @@ from pkg_resources import resource_filename
 
 TESTFILE_DIR = resource_filename('porebuilder', 'tests/test_molecules')
 
+
 class BaseTest:
 
     @pytest.fixture(autouse=True)
@@ -21,5 +22,6 @@ class BaseTest:
         from porebuilder.porebuilder import GraphenePoreSolvent
         h2o = mb.load(os.path.join(TESTFILE_DIR, 'tip3p.mol2'))
         h2o.name = 'SOL'
-        return GraphenePoreSolvent(pore_depth=3, side_dim=3, n_sheets=3, pore_width=1,
-                x_bulk=3, solvent=[h2o], n_solvent=10)
+        return GraphenePoreSolvent(pore_depth=3, side_dim=3, n_sheets=3,
+                                   pore_width=1, x_bulk=3, solvent=[h2o],
+                                   n_solvent=10)

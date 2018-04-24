@@ -31,11 +31,11 @@ class GraphenePoreSolvent(mb.Compound):
 
     """
     def __init__(self, pore_depth, side_dim, n_sheets, pore_width, x_bulk,
-            solvent, n_solvent):
+                 solvent, n_solvent):
         super(GraphenePoreSolvent, self).__init__()
 
         pore = GraphenePore(pore_depth=pore_depth, side_dim=side_dim,
-                              n_sheets=n_sheets, pore_width=pore_width)
+                            n_sheets=n_sheets, pore_width=pore_width)
 
         box = mb.Box(pore.periodicity)
         box.maxs[0] += 2 * x_bulk
@@ -75,8 +75,7 @@ class GraphenePore(mb.Compound):
         # multiplication
         # TODO: Figure out if rounding is necessary
         factor = np.cos(np.pi/6)
-        replicate = [(pore_depth/0.2456),
-                (side_dim/0.2456)*(1/factor)]
+        replicate = [(pore_depth/0.2456), (side_dim/0.2456)*(1/factor)]
         if all(x <= 0 for x in [pore_depth, side_dim]):
             msg = 'Dimension of graphene sheet must be greater than zero'
             raise ValueError(msg)
