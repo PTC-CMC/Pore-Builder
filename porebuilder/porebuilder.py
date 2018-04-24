@@ -37,7 +37,7 @@ class GraphenePoreSolvent(mb.Compound):
                               sheets=sheets, pore_width=pore_width)
 
         box = mb.Box(pore.periodicity)
-        box.maxs[2] += 2 * x_bulk
+        box.maxs[0] += 2 * x_bulk
 
         system = mb.solvate(pore, solvent, n_solvent, box=box, overlap=0.2)
 
