@@ -3,7 +3,7 @@ from foyer import Forcefield
 
 C = Forcefield('files/carbon.xml')
 
-system = GraphenePore(x_sheet=4, y_sheet=2, sheets=3, pore_width=1.2)
+system = GraphenePore(pore_depth=4, side_dim=2, n_sheets=3, pore_width=1.2)
 
 system = C.apply(system)
 

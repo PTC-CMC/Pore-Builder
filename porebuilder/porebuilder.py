@@ -5,36 +5,37 @@ __all__ = ['GraphenePoreSolvent', 'GraphenePore']
 
 
 class GraphenePoreSolvent(mb.Compound):
-    """A general slit pore recipe that solvates the system
+    """A general slit pore recipe that includes baths of fluid.
 
     Parameters
     ----------
-    x_sheet : int
-        dimensions of graphene sheet in x-direction [nm]
-    y_sheet : int
-        dimensions of graphene sheet in y-direction [nm]
-    sheets : int
-        number of graphene sheets, default=3
-    pore_width: int
-        width of slit pore [nm]
-    x_bulk : int
-        length of bulk region in x-direction [nm]
-    solvent : dict or an array of 2 dicts
-        compound(s) to solvate the system with.
-        Note: does not currently support more than 2 solvents
-    n_solvent : int
-        number of solvents to solvate the system with. Array must
-        match size of 'solvent'
+    pore_depth : int, default=4
+        dimensions of graphene sheet in x direction in nm
+    side_dim : int, default=4
+        dimensions of graphene sheet in z direction in nm
+    n_sheets : int, default=3
+        number of parallel graphene sheets
+    pore_width: int, default=1
+        width of slit pore in nm
+    x_bulk : int, default=3
+        length of bulk region in x-direction in nm
+    solvent : list of mbuild.Compound
+        list of compound(s) to solvate the system with
+    n_solvent : list of int
+        number of solvents to solvate the system with
+    NOTE: length of `solvent` must match length of `n_solvent`
+
     Attributes
     ----------
+    see mbuild.Compound
 
     """
-    def __init__(self, x_sheet, y_sheet, sheets, pore_width, x_bulk,
+    def __init__(self, pore_depth, side_dim, n_sheets, pore_width, x_bulk,
             solvent, n_solvent):
         super(GraphenePoreSolvent, self).__init__()
 
-        pore = GraphenePore(x_sheet=x_sheet, y_sheet=y_sheet,
-                              sheets=sheets, pore_width=pore_width)
+        pore = GraphenePore(pore_depth=pore_depth, side_dim=side_dim,
+                              n_sheets=n_sheets, pore_width=pore_width)
 
         box = mb.Box(pore.periodicity)
         box.maxs[0] += 2 * x_bulk
@@ -48,27 +49,25 @@ class GraphenePoreSolvent(mb.Compound):
 
 
 class GraphenePore(mb.Compound):
-    """A general slit pore recipe.  Does not solvate system.  Use
-    'GraphenePoreSolvent' instead if you wish to solvate your system.
+    """A general slit pore recipe.
 
     Parameters
     ----------
-    x_sheet : int
-        dimensions of graphene sheet in x-direction [nm]
-    y_sheet : int
-        dimensions of graphene sheet in y-direction [nm]
-    sheets : int
-        number of graphene sheets, default=3
-    pore_width : int
-        width of slit pore [nm]
-    x_bulk : int
-        length of bulk region in x-direction [nm]
+    pore_depth : int, default=4
+        dimensions of graphene sheet in x direction in nm
+    side_dim : int, default=4
+        dimensions of graphene sheet in z direction in nm
+    n_sheets : int, default=3
+        number of parallel graphene sheets
+    pore_width: int, default=1
+        width of slit pore in nm
+
     Attributes
     ----------
+    see mbuild.Compound
 
-    Notes: Match graphene y-dimension with box x-dimension
     """
-    def __init__(self, x_sheet, y_sheet, sheets, pore_width):
+    def __init__(self, pore_depth, side_dim, n_sheets, pore_width):
         super(GraphenePore, self).__init__()
 
         # Do some math to figure out how much to replicate graphene cell.
@@ -76,9 +75,9 @@ class GraphenePore(mb.Compound):
         # multiplication
         # TODO: Figure out if rounding is necessary
         factor = np.cos(np.pi/6)
-        replicate = [(x_sheet/0.2456),
-                (y_sheet/0.2456)*(1/factor)]
-        if all(x <= 0 for x in [x_sheet, y_sheet]):
+        replicate = [(pore_depth/0.2456),
+                (side_dim/0.2456)*(1/factor)]
+        if all(x <= 0 for x in [pore_depth, side_dim]):
             msg = 'Dimension of graphene sheet must be greater than zero'
             raise ValueError(msg)
         carbon = mb.Compound()
