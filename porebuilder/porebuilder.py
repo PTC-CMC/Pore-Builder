@@ -93,21 +93,21 @@ class GraphenePore(mb.Compound):
 
         graphene = graphene_lattice.populate(compound_dict={carbon.name: carbon},
                                              x=replicate[0], y=replicate[1],
-                                             z=sheets)
+                                             z=n_sheets)
 
         for particle in graphene.particles():
             if particle.xyz[0][0] < 0:
                 particle.xyz[0][0] += graphene.periodicity[0]
         graphene.periodicity[1] *= factor  # cos(30)*.246
-        bottom_sheet = mb.clone(graphene)
-        bottom_sheet.spin(1.5708, [1, 0, 0])
-        bottom_sheet.name = 'BOT'
+        bot_sheet = mb.clone(graphene)
+        bot_sheet.spin(1.5708, [1, 0, 0])
+        bot_sheet.name = 'BOT'
         top_sheet = mb.clone(graphene)
         top_sheet.spin(1.5708, [1, 0, 0])
         top_sheet.translate([0, pore_width + (graphene.periodicity[2] - 0.335), 0])
         top_sheet.name = 'TOP'
         self.add(top_sheet)
-        self.add(bottom_sheet)
+        self.add(bot_sheet)
         self.periodicity[0] = graphene.periodicity[0]
         self.periodicity[1] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
         self.periodicity[2] = graphene.periodicity[1]
