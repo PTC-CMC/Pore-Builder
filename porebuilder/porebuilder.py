@@ -72,7 +72,7 @@ class GraphenePore(mb.Compound):
 
         factor = np.cos(np.pi/6)
         # Estimate the number of lattice repeat units
-        replicate = [(pore_depth/0.2456), (side_dim/0.2456)*(1/factor)]
+        replicate = [int(pore_depth/0.2456), (side_dim/0.2456)*(1/factor)]
         if all(x <= 0 for x in [pore_depth, side_dim]):
             msg = 'Dimension of graphene sheet must be greater than zero'
             raise ValueError(msg)
