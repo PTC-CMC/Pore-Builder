@@ -70,11 +70,8 @@ class GraphenePore(mb.Compound):
     def __init__(self, pore_depth, side_dim, n_sheets, pore_width):
         super(GraphenePore, self).__init__()
 
-        # Do some math to figure out how much to replicate graphene cell.
-        # Multiply replicate[1] by 15/13 to take into account later
-        # multiplication
-        # TODO: Figure out if rounding is necessary
         factor = np.cos(np.pi/6)
+        # Estimate the number of lattice repeat units
         replicate = [(pore_depth/0.2456), (side_dim/0.2456)*(1/factor)]
         if all(x <= 0 for x in [pore_depth, side_dim]):
             msg = 'Dimension of graphene sheet must be greater than zero'
