@@ -2,4 +2,3 @@ numpy
 pytest
 mbuild
 setuptools
-pkg_resources
