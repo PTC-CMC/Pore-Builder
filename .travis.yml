@@ -1,14 +1,29 @@
-language: python
+language: generic
 
-python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
+sudo: false
+
+matrix:
+  include:
+    - { os: linux, env: PYTHON_VERSION=2.7 }
+    - { os: linux, env: PYTHON_VERSION=3.4 }
+    - { os: linux, env: PYTHON_VERSION=3.5 }
+    - { os: linux, env: PYTHON_VERSION=3.6 }
+    - { os: osx, env: PYTHON_VERSION=2.7 }
+    - { os: osx, env: PYTHON_VERSION=3.4 }
+    - { os: osx, env: PYTHON_VERSION=3.5 }
+    - { os: osx, env: PYTHON_VERSION=3.6 }
 
 install:
-  - pip install -r requirements.txt
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install md5sha1sum; fi
+  - source devtools/travis-ci/install.sh
+  - conda config --set always_yes yes --set changeps1 no
+  - conda config --add channels omnia
+  - conda config --add channels conda-forge
+  - conda config --add channels mosdef
+  - conda create -n test-environment python=$PYTHON_VERSION --file requirements.txt
+  - source activate test-environment
+  - pip install -e .
 
 script:
-  - pytest
+  - python -m pytest
