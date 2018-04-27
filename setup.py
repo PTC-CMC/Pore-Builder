@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name='Pore-Builder',
+setup(name='porebuilder',
         version='0.1',
         description='Graphene slit-pore builder for mBuild',
         url='http://github.com/rmatsum836/Pore-Builder',

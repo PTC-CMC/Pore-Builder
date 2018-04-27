@@ -1,59 +1,52 @@
 import numpy as np
-import pytest
 import mbuild as mb
-import parmed as pmd
-from base_test import BaseTest
+from porebuilder.tests.base_test import BaseTest
+
 
 class TestPoreBuilder(BaseTest):
     """
     Unit Tests for Pore class functionality.
     """
 
-    def test_save(self, gph_pore_nosolv, gph_pore_solv):
-        gph_pore_nosolv.save(filename='gph_pore_nosolv.gro')
-        gph_pore_solv.save(filename='gph_pore.gro')
+    def test_save_dry(self, GraphenePore):
+        GraphenePore.save(filename='dry_pore.gro')
 
-    def test_porewidth(self, gph_pore_solv):
-        bot = np.min(gph_pore_solv.bot_xyz[:,1])
-        top = np.max(gph_pore_solv.top_xyz[:,1]) # change naming
-        pore_width = bot - top
-        np.testing.assert_almost_equal(pore_width, 1, 4)
+    def test_save_solvated(self, GraphenePoreSolvent):
+        GraphenePoreSolvent.save(filename='solvated_pore.gro')
 
-    def test_sheet_dims(self, gph_pore_solv):
-        x_length = np.max(gph_pore_solv.bot_xyz[:,0]) 
-        - np.min(gph_pore_solv.bot_xyz[:,0])
-        assert x_length == pytest.approx(3, 0.5)
-        y_length = np.max(gph_pore_solv.bot_xyz[:,2])
-        - np.min(gph_pore_solv.bot_xyz[:,2])
-        assert y_length == pytest.approx(3, 0.5)
-    
-    def test_n_particles(self, gph_pore_solv, gph_pore_nosolv):
-        if gph_pore_solv:
-            assert gph_pore_solv.n_particles == 5016
-        elif gph_pore_nosolv:
-            assert gph_pore_nosolv.n_particles == 2016
-    
-    def test_particles_in_box(self, gph_pore_solv):
-        box = mb.Box(gph_pore_solv.box)
-        totalPM = pmd.Structure()
-        for child in gph_pore_solv.children:
-            if child.name in 'Compound':
-                totalPM += child.to_parmed(residues='Compound', box=box)
-            elif child.name in gph_pore_solv.fluid_name:
-                totalPM += child.to_parmed(residues='SOL', box=box)
-        gphPM = totalPM['Compound',:]
-        SOLPM = totalPM['SOL', :]
-        systemPM = gphPM + SOLPM
-        systemPM.box = np.empty(6)
-        systemPM.box[:3] = box.maxs * 10 
-        systemPM.box[3:7] = 90
-        for position in gph_pore_solv.xyz:
-            for x in range(3):
-                assert position[x] < systemPM.box[x]
-                assert position[x] >= 0.0 # May have to change this test
+    def test_hierarchy_dry(self, GraphenePore):
+        assert len(GraphenePore.children) == 2
 
-    # TODO: Get correct x-dimension of graphene sheet
-    """def test_x_bulk_length(self, gph_pore_solv):
-        gph_length = np.max(gph_pore_solv.bot_xyz[0])
-        np.min(gph_pore_solv.bot_xyz[0])
-        assert (gph_pore_solv.periodicity[0] - gph_length)/2 == # need value"""
+    def test_hierarchy_solvated(self, GraphenePoreSolvent):
+        assert len(GraphenePoreSolvent.children) == 11
+        lens = [2] + 10 * [3]
+        assert [len(c.children) for c in GraphenePoreSolvent.children] == lens
+
+    def test_porewidth(self, GraphenePore):
+        bot = next(c for c in GraphenePore.children if c.name == 'BOT')
+        top = next(c for c in GraphenePore.children if c.name == 'TOP')
+        bot_y = np.max(bot.xyz[:, 1])
+        top_y = np.min(top.xyz[:, 1])
+        assert np.isclose(top_y - bot_y, 1.0, 3)
+
+    def test_sheet_dims(self, GraphenePore):
+        bot = next(c for c in GraphenePore.children if c.name == 'BOT')
+        top = next(c for c in GraphenePore.children if c.name == 'TOP')
+        x_length = np.ptp(bot.xyz[:, 0])
+        y_length = np.ptp(bot.xyz[:, 1])
+        assert np.isclose(x_length, 3, 1)
+        assert np.isclose(y_length, 3, 1)
+
+    def test_n_particles(self, GraphenePoreSolvent, GraphenePore):
+        if GraphenePoreSolvent:
+            assert GraphenePoreSolvent.n_particles == 2046
+        elif GraphenePore:
+            assert GraphenePore.n_particles == 2016
+
+    def test_particles_in_box(self, GraphenePoreSolvent):
+        box = mb.Box(GraphenePoreSolvent.periodicity)
+
+        for particle in GraphenePoreSolvent.particles():
+            assert particle.xyz[0][0] < box.maxs[0]
+            assert particle.xyz[0][1] < box.maxs[1]
+            assert particle.xyz[0][2] < box.maxs[2]
