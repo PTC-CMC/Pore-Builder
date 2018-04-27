@@ -30,8 +30,8 @@ class GraphenePoreSolvent(mb.Compound):
     see mbuild.Compound
 
     """
-    def __init__(self, pore_depth, side_dim, n_sheets, pore_width, x_bulk,
-                 solvent, n_solvent):
+    def __init__(self, pore_depth=4, side_dim=4, n_sheets=3, pore_width=1,
+                 x_bulk=3, solvent, n_solvent):
         super(GraphenePoreSolvent, self).__init__()
 
         pore = GraphenePore(pore_depth=pore_depth, side_dim=side_dim,
@@ -67,7 +67,7 @@ class GraphenePore(mb.Compound):
     see mbuild.Compound
 
     """
-    def __init__(self, pore_depth, side_dim, n_sheets, pore_width):
+    def __init__(self, pore_depth=4, side_dim=4, n_sheets=3, pore_width=1):
         super(GraphenePore, self).__init__()
 
         factor = np.cos(np.pi/6)
