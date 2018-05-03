@@ -1,2 +1,2 @@
-from porebuilder.porebuilder import GraphenePoreSolvent
-from porebuilder.porebuilder import GraphenePore
+from .porebuilder import GraphenePoreSolvent
+from .porebuilder import GraphenePore
