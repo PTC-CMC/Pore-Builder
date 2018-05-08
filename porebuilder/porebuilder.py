@@ -4,50 +4,6 @@ import numpy as np
 __all__ = ['GraphenePoreSolvent', 'GraphenePore']
 
 
-class GraphenePoreSolvent(mb.Compound):
-    """A general slit pore recipe that includes baths of fluid.
-
-    Parameters
-    ----------
-    pore_depth : int, default=4
-        dimensions of graphene sheet in x direction in nm
-    side_dim : int, default=4
-        dimensions of graphene sheet in z direction in nm
-    n_sheets : int, default=3
-        number of parallel graphene sheets
-    pore_width: int, default=1
-        width of slit pore in nm
-    x_bulk : int, default=3
-        length of bulk region in x-direction in nm
-    solvent : list of mbuild.Compound
-        list of compound(s) to solvate the system with
-    n_solvent : list of int
-        number of solvents to solvate the system with
-    NOTE: length of `solvent` must match length of `n_solvent`
-
-    Attributes
-    ----------
-    see mbuild.Compound
-
-    """
-    def __init__(self, pore_depth, side_dim, n_sheets, pore_width, x_bulk,
-                 solvent, n_solvent):
-        super(GraphenePoreSolvent, self).__init__()
-
-        pore = GraphenePore(pore_depth=pore_depth, side_dim=side_dim,
-                            n_sheets=n_sheets, pore_width=pore_width)
-
-        box = mb.Box(pore.periodicity)
-        box.maxs[0] += 2 * x_bulk
-
-        system = mb.solvate(pore, solvent, n_solvent, box=box, overlap=0.2)
-
-        for child in system.children:
-            self.add(mb.clone(child))
-
-        self.periodicity = box.maxs
-
-
 class GraphenePore(mb.Compound):
     """A general slit pore recipe.
 
@@ -67,7 +23,7 @@ class GraphenePore(mb.Compound):
     see mbuild.Compound
 
     """
-    def __init__(self, pore_depth, side_dim, n_sheets, pore_width):
+    def __init__(self, pore_depth=4, side_dim=3, n_sheets=3, pore_width=1):
         super(GraphenePore, self).__init__()
 
         factor = np.cos(np.pi/6)
@@ -107,3 +63,48 @@ class GraphenePore(mb.Compound):
         self.periodicity[1] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
         self.periodicity[2] = graphene.periodicity[1]
         self.xyz -= np.min(self.xyz, axis=0)
+
+
+class GraphenePoreSolvent(mb.Compound):
+    """A general slit pore recipe that includes baths of fluid.
+
+    Parameters
+    ----------
+    pore_depth : int, default=4
+        dimensions of graphene sheet in x direction in nm
+    side_dim : int, default=4
+        dimensions of graphene sheet in z direction in nm
+    n_sheets : int, default=3
+        number of parallel graphene sheets
+    pore_width: int, default=1
+        width of slit pore in nm
+    x_bulk : int, default=3
+        length of bulk region in x-direction in nm
+    solvent : list of mbuild.Compound
+        list of compound(s) to solvate the system with
+    n_solvent : list of int
+        number of solvents to solvate the system with
+    NOTE: length of `solvent` must match length of `n_solvent`
+
+    Attributes
+    ----------
+    see mbuild.Compound
+
+    """
+    def __init__(self, pore_depth=4, side_dim=3, n_sheets=3, pore_width=1,
+                 x_bulk=3, solvent=None, n_solvent=100):
+
+        super(GraphenePoreSolvent, self).__init__()
+
+        pore = GraphenePore(pore_depth=pore_depth, side_dim=side_dim,
+                            n_sheets=n_sheets, pore_width=pore_width)
+
+        box = mb.Box(pore.periodicity)
+        box.maxs[0] += 2 * x_bulk
+
+        system = mb.solvate(pore, solvent, n_solvent, box=box, overlap=0.2)
+
+        for child in system.children:
+            self.add(mb.clone(child))
+
+        self.periodicity = box.maxs
