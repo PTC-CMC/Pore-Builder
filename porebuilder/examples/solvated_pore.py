@@ -4,28 +4,20 @@ from foyer import Forcefield
 
 water = mb.load('files/tip3p.mol2')
 water.name = 'water'
-acn = mb.load('files/acn.mol2')
-acn.name = 'acn'
+na = mb.load('files/na.mol2')
+na.name = 'na'
+cl = mb.load('files/cl.mol2')
+cl.name = 'cl'
 
 C = Forcefield('files/carbon.xml')
-SPCE = Forcefield('files/spce.xml')
-OPLS = Forcefield(name='oplsaa')
+OPLS = Forcefield('files/oplsaa.xml')
 
 system = GraphenePoreSolvent(pore_depth=4, side_dim=4, n_sheets=3,
-                             pore_width=1.2, x_bulk=3, solvent=[water, acn],
-                             n_solvent=[1, 1])
+                             pore_width=1.2, x_bulk=3, solvent=[na, cl, water],
+                             n_solvent=[100, 100, 4000])
 
 box = mb.Box(system.periodicity)
 
-for child in system.children:
-    if child.name == 'water':
-        water_pmd = SPCE.apply(child)
-    elif child.name == 'acn':
-        acn_pmd = OPLS.apply(child)
-    else:
-        pore_pmd = C.apply(child)
-
-system = water_pmd + acn_pmd + pore_pmd
-system.box[:3] = box.maxs * 10.0
+system = OPLS.apply(system)
 system.save('solvated_pore.gro', overwrite=True)
 system.save('solvated_pore.top', overwrite=True, combine='all')

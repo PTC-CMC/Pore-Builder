@@ -1,0 +1,30 @@
+<ForceField>
+ <AtomTypes>
+  <Type name="fake_c" class="C" element="C" mass="12.011" def="C" desc="generic carbon"/>
+  <Type name="opls_111" class="OW" element="O" mass="15.999" def="O" desc="water oxygen"/>
+  <Type name="opls_112" class="HW" element="H" mass="1.008" def="H" desc="water hydrogen"/>
+  <Type name="opls_401" class="Cl-" element="Cl" mass="35.45300" def="Cl" desc="chloride ion"/>
+  <Type name="opls_404" class="Li+" element="Li" mass="6.94100" def="Li" desc="lithium ion"/>
+  <Type name="opls_407" class="Na+" element="Na" mass="22.98977" def="Na" desc="sodium ion"/>
+  <Type name="opls_408" class="K+" element="K" mass="39.0983" def="K" desc="potassium ion"/>
+  <Type name="opls_411" class="Mg2+" element="Mg" mass="24.30500" def="Mg" desc="magnesium ion"/>
+  <Type name="opls_412" class="Ca2+" element="Ca" mass="40.08" def="Ca" desc="calcium ion"/>
+ </AtomTypes>
+ <HarmonicBondForce>
+  <Bond class1="OW" class2="HW" length="0.09572" k="502416.0"/>
+ </HarmonicBondForce>
+ <HarmonicAngleForce>
+  <Angle class1="HW" class2="OW" class3="HW" angle="1.824218134" k="682.02"/>
+ </HarmonicAngleForce>
+ <NonbondedForce coulomb14scale="0.5" lj14scale="0.5">
+  <Atom type="fake_c" charge="0" sigma="0.339966950842" epsilon="0.359824"/>
+  <Atom type="opls_111" charge="-0.834" sigma="0.315061" epsilon="0.636386"/>
+  <Atom type="opls_112" charge="0.417" sigma="1.0" epsilon="0.0"/>
+  <Atom type="opls_401" charge="-1" sigma="0.441724" epsilon="0.492833"/>
+  <Atom type="opls_404" charge="1" sigma="0.125992" epsilon="26.1500"/>
+  <Atom type="opls_407" charge="1.0" sigma="0.333045" epsilon="0.011598"/>
+  <Atom type="opls_408" charge="1.0" sigma="0.493463" epsilon="0.00137235"/>
+  <Atom type="opls_411" charge="2" sigma="0.164447" epsilon="3.66118"/>
+  <Atom type="opls_412" charge="2.0" sigma="0.241203" epsilon="1.88136"/>
+ </NonbondedForce>
+</ForceField>
