@@ -1,5 +1,6 @@
 numpy
 pytest
 mbuild
+mdtraj
+parmed
 setuptools
-pkg_resources
