@@ -18,6 +18,11 @@ class BaseTest:
         return GraphenePore(pore_depth=3, side_dim=3, n_sheets=3, pore_width=1)
 
     @pytest.fixture
+    def DoubleGraphenePore(self):
+        from porebuilder.porebuilder import DoubleGraphenePore
+        return DoubleGraphenePore(pore_depth=3, side_dim=3, n_sheets=3, pore_width=[1, 2])
+
+    @pytest.fixture
     def GraphenePoreSolvent(self):
         from porebuilder.porebuilder import GraphenePoreSolvent
         h2o = mb.load(os.path.join(TESTFILE_DIR, 'tip3p.mol2'))
