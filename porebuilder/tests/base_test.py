@@ -20,7 +20,7 @@ class BaseTest:
     @pytest.fixture
     def DoubleGraphenePore(self):
         from porebuilder.porebuilder import DoubleGraphenePore
-        return DoubleGraphenePore(pore_depth=3, side_dim=3, n_sheets=3, pore_width=[1, 2])
+        return DoubleGraphenePore(pore_depth=3, side_dim=3, n_sheets=3, pore_widths=[1, 2])
 
     @pytest.fixture
     def GraphenePoreSolvent(self):

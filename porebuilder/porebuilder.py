@@ -162,15 +162,15 @@ class DoubleGraphenePore(mb.Compound):
         mid_sheet = mb.clone(graphene)
         mid_sheet.spin(1.5708, [1, 0, 0])
         mid_sheet.name = 'MID'
-        mid_sheet.translate([0, pore_width[0] + (graphene.periodicity[2] - 0.335), 0])
+        mid_sheet.translate([0, pore_widths[0] + (graphene.periodicity[2] - 0.335), 0])
         top_sheet = mb.clone(graphene)
         top_sheet.spin(1.5708, [1, 0, 0])
-        top_sheet.translate([0, pore_width[0] + pore_width[1] + 2 * (graphene.periodicity[2] - 0.335), 0])
+        top_sheet.translate([0, pore_widths[0] + pore_widths[1] + 2 * (graphene.periodicity[2] - 0.335), 0])
         top_sheet.name = 'TOP'
         self.add(top_sheet)
         self.add(mid_sheet)
         self.add(bot_sheet)
         self.periodicity[0] = graphene.periodicity[0]
-        self.periodicity[1] = 3 * graphene.periodicity[2] - lattice_spacing[2] + pore_width[0] + pore_width[1]
+        self.periodicity[1] = 3 * graphene.periodicity[2] - lattice_spacing[2] + pore_widths[0] + pore_widths[1]
         self.periodicity[2] = graphene.periodicity[1]
         self.xyz -= np.min(self.xyz, axis=0)
