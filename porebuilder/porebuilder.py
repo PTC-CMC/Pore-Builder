@@ -108,3 +108,69 @@ class GraphenePoreSolvent(mb.Compound):
             self.add(mb.clone(child))
 
         self.periodicity = box.maxs
+
+
+class DoubleGraphenePore(mb.Compound):
+    """A double slit pore recipe.
+
+    Parameters
+    ----------
+    pore_depth : int, default=4
+        dimensions of graphene sheet in x direction in nm
+    side_dim : int, default=4
+        dimensions of graphene sheet in z direction in nm
+    n_sheets : int, default=3
+        number of parallel graphene sheets
+    pore_widths : list of int, default=[1, 1]
+        width of slit pores in nm
+
+    Attributes
+    ----------
+    see mbuild.Compound
+
+    """
+    def __init__(self, pore_depth=4, side_dim=3, n_sheets=3, pore_widths=[1, 1]):
+        super(DoubleGraphenePore, self).__init__()
+
+        factor = np.cos(np.pi/6)
+        # Estimate the number of lattice repeat units
+        replicate = [int(pore_depth/0.2456), (side_dim/0.2456)*(1/factor)]
+        if all(x <= 0 for x in [pore_depth, side_dim]):
+            msg = 'Dimension of graphene sheet must be greater than zero'
+            raise ValueError(msg)
+        carbon = mb.Compound()
+        carbon.name = 'C'
+        carbon_locations = [[0, 0, 0], [2/3, 1/3, 0]]
+        basis = {carbon.name: carbon_locations}
+        lattice_spacing = [0.2456, 0.2456, 0.335]
+        angles = [90.0, 90.0, 120.0]
+
+        graphene_lattice = mb.Lattice(lattice_spacing=lattice_spacing,
+                                      angles=angles, lattice_points=basis)
+
+        graphene = graphene_lattice.populate(compound_dict={carbon.name: carbon},
+                                             x=replicate[0], y=replicate[1],
+                                             z=n_sheets)
+
+        for particle in graphene.particles():
+            if particle.xyz[0][0] < 0:
+                particle.xyz[0][0] += graphene.periodicity[0]
+        graphene.periodicity[1] *= factor  # cos(30)*.246
+        bot_sheet = mb.clone(graphene)
+        bot_sheet.spin(1.5708, [1, 0, 0])
+        bot_sheet.name = 'BOT'
+        mid_sheet = mb.clone(graphene)
+        mid_sheet.spin(1.5708, [1, 0, 0])
+        mid_sheet.name = 'MID'
+        mid_sheet.translate([0, pore_width[0] + (graphene.periodicity[2] - 0.335), 0])
+        top_sheet = mb.clone(graphene)
+        top_sheet.spin(1.5708, [1, 0, 0])
+        top_sheet.translate([0, pore_width[0] + pore_width[1] + 2 * (graphene.periodicity[2] - 0.335), 0])
+        top_sheet.name = 'TOP'
+        self.add(top_sheet)
+        self.add(mid_sheet)
+        self.add(bot_sheet)
+        self.periodicity[0] = graphene.periodicity[0]
+        self.periodicity[1] = 3 * graphene.periodicity[2] - lattice_spacing[2] + pore_width[0] + pore_width[1]
+        self.periodicity[2] = graphene.periodicity[1]
+        self.xyz -= np.min(self.xyz, axis=0)
