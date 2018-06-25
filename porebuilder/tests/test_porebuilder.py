@@ -53,3 +53,6 @@ class TestPoreBuilder(BaseTest):
             assert particle.xyz[0][0] < box.maxs[0]
             assert particle.xyz[0][1] < box.maxs[1]
             assert particle.xyz[0][2] < box.maxs[2]
+
+    def test_double_periodicity(self, DoubleGraphenePore):
+        assert np.allclose(DoubleGraphenePore.periodicity, [2.9472, 5.545, 2.97774175], rtol=0.01)
