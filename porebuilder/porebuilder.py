@@ -171,6 +171,6 @@ class DoubleGraphenePore(mb.Compound):
         self.add(mid_sheet)
         self.add(bot_sheet)
         self.periodicity[0] = graphene.periodicity[0]
-        self.periodicity[1] = 3 * graphene.periodicity[2] - lattice_spacing[2] + pore_widths[0] + pore_widths[1]
+        self.periodicity[1] = 3 * graphene.periodicity[2] - 2 * lattice_spacing[2] + pore_widths[0] + pore_widths[1]
         self.periodicity[2] = graphene.periodicity[1]
         self.xyz -= np.min(self.xyz, axis=0)
