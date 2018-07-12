@@ -1,6 +1,9 @@
 import numpy as np
 import mbuild as mb
+import pytest
+
 from porebuilder.tests.base_test import BaseTest
+import porebuilder as pb
 
 
 class TestPoreBuilder(BaseTest):
@@ -50,3 +53,35 @@ class TestPoreBuilder(BaseTest):
             assert particle.xyz[0][0] < box.maxs[0]
             assert particle.xyz[0][1] < box.maxs[1]
             assert particle.xyz[0][2] < box.maxs[2]
+
+    def test_functionalize_surface(self):
+
+        class H(mb.Compound):
+            def __init__(self):
+                super(H, self).__init__()
+
+                self.add(mb.Particle(name='H'))
+                up_port = mb.Port(
+                    anchor=self[0], orientation=[
+                        0, 1, 0], separation=.075)
+                self.add(up_port, "up")
+
+        class O(mb.Compound):
+            def __init__(self):
+                super(O, self).__init__()
+
+                self.add(mb.Particle(name='O'))
+                up_port = mb.Port(
+                    anchor=self[0], orientation=[
+                        0, 1, 0], separation=.075)
+                self.add(up_port, "up")
+
+        with pytest.raises(ValueError):
+            pb.GraphenePoreFunctionalized(
+                func_groups=[H(), O()], func_percent=[.03, .04, .03])
+
+        for per in range(1, 10):
+            pore = pb.GraphenePoreFunctionalized(
+                func_groups=H(), func_percent=per / 10)
+            assert(pore.n_particles - 2688 > (per - .3) / 10 *
+                   864 and pore.n_particles - 2688 < (per + .3) / 10 * 864)
