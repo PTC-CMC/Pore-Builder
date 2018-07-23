@@ -3,7 +3,7 @@ import numpy as np
 from copy import deepcopy
 from six import string_types
 
-__all__ = ['GraphenePoreSolvent', 'GraphenePoreFunctionalized', 'GraphenePore']
+__all__ = ['GraphenePoreSolvent', 'GraphenePore']
 
 
 class GraphenePore(mb.Compound):
@@ -25,20 +25,18 @@ class GraphenePore(mb.Compound):
     see mbuild.Compound
 
     """
-
     def __init__(self, pore_depth=4, side_dim=3, n_sheets=3, pore_width=1):
         super(GraphenePore, self).__init__()
 
-        factor = np.cos(np.pi / 6)
+        factor = np.cos(np.pi/6)
         # Estimate the number of lattice repeat units
-        replicate = [int(pore_depth / 0.2456),
-                     (side_dim / 0.2456) * (1 / factor)]
+        replicate = [int(pore_depth/0.2456), (side_dim/0.2456)*(1/factor)]
         if all(x <= 0 for x in [pore_depth, side_dim]):
             msg = 'Dimension of graphene sheet must be greater than zero'
             raise ValueError(msg)
         carbon = mb.Compound()
         carbon.name = 'C'
-        carbon_locations = [[0, 0, 0], [2 / 3, 1 / 3, 0]]
+        carbon_locations = [[0, 0, 0], [2/3, 1/3, 0]]
         basis = {carbon.name: carbon_locations}
         lattice_spacing = [0.2456, 0.2456, 0.335]
         angles = [90.0, 90.0, 120.0]
@@ -46,12 +44,9 @@ class GraphenePore(mb.Compound):
         graphene_lattice = mb.Lattice(lattice_spacing=lattice_spacing,
                                       angles=angles, lattice_points=basis)
 
-        graphene = graphene_lattice.populate(
-            compound_dict={
-                carbon.name: carbon},
-            x=replicate[0],
-            y=replicate[1],
-            z=n_sheets)
+        graphene = graphene_lattice.populate(compound_dict={carbon.name: carbon},
+                                             x=replicate[0], y=replicate[1],
+                                             z=n_sheets)
 
         for particle in graphene.particles():
             if particle.xyz[0][0] < 0:
@@ -62,14 +57,12 @@ class GraphenePore(mb.Compound):
         bot_sheet.name = 'BOT'
         top_sheet = mb.clone(graphene)
         top_sheet.spin(1.5708, [1, 0, 0])
-        top_sheet.translate(
-            [0, pore_width + (graphene.periodicity[2] - 0.335), 0])
+        top_sheet.translate([0, pore_width + (graphene.periodicity[2] - 0.335), 0])
         top_sheet.name = 'TOP'
         self.add(top_sheet)
         self.add(bot_sheet)
         self.periodicity[0] = graphene.periodicity[0]
-        self.periodicity[1] = 2 * graphene.periodicity[2] - \
-            lattice_spacing[2] + pore_width
+        self.periodicity[1] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
         self.periodicity[2] = graphene.periodicity[1]
         self.xyz -= np.min(self.xyz, axis=0)
 
@@ -100,7 +93,6 @@ class GraphenePoreSolvent(mb.Compound):
     see mbuild.Compound
 
     """
-
     def __init__(self, pore_depth=4, side_dim=3, n_sheets=3, pore_width=1,
                  x_bulk=3, solvent=None, n_solvent=100):
 
@@ -118,6 +110,7 @@ class GraphenePoreSolvent(mb.Compound):
             self.add(mb.clone(child))
 
         self.periodicity = box.maxs
+
 
 
 class GraphenePoreFunctionalized(mb.Compound):
@@ -183,17 +176,14 @@ class GraphenePoreFunctionalized(mb.Compound):
         b_surface = []
 
         for C in Top:
-            if C.pos[0] >= 0 and C.pos[1] <= .336 * \
-                    (n_sheets - 1) + pore_width:
+            if C.pos[0] >= 0 and C.pos[1] <= .336 * (n_sheets - 1) + pore_width
                 t_surface.append(C)
 
         for C in t_surface:
             roll = np.random.rand()
             for chance, group, port in zip(cdf, func_groups, func_ports):
                 if roll <= chance:
-                    down_port = mb.Port(
-                        anchor=C, orientation=[
-                            0, -1, 0], separation=0.075)
+                    down_port = mb.Port(anchor=C, orientation=[0, -1, 0], separation=0.075)
                     C.add(down_port, 'down', containment=False)
                     new_group = deepcopy(group)
                     Top.add(new_group)
@@ -211,14 +201,11 @@ class GraphenePoreFunctionalized(mb.Compound):
             roll = np.random.rand()
             for chance, group, port in zip(cdf, func_groups, func_ports):
                 if roll <= chance:
-                    up_port = mb.Port(
-                        anchor=C, orientation=[
-                            0, 1, 0], separation=0.075)
+                    up_port = mb.Port(anchor=C, orientation=[0, 1, 0], separation=0.075)
                     C.add(up_port, 'up', containment=False)
                     new_group = deepcopy(group)
                     Bot.add(new_group)
-                    mb.force_overlap(
-                        new_group, new_group.labels[port], C.labels['up'])
+                    mb.force_overlap(new_group, new_group.labels[port], C.labels['up'])
                     break
 
         for child in pore.children:
