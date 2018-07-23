@@ -134,8 +134,8 @@ class GraphenePoreFunctionalized(mb.Compound):
     func_percent : float or List-like thereof, defualt=.03
         percentage of surface to be functionalized by groups in func_groups
     NOTE: Both func_ports and func_percent must be in the same order as their
-        corresponding functional group in func_groups. If only one value is given
-        for either func_ports or func_percent that value will be used for all
+        corresponding functional group in func_groups. If only one value is
+        given for either func_ports or func_percent that value will be used for all
         compounds in func_groups.
     Attributes
     ----------
@@ -183,7 +183,8 @@ class GraphenePoreFunctionalized(mb.Compound):
             roll = np.random.rand()
             for chance, group, port in zip(cdf, func_groups, func_ports):
                 if roll <= chance:
-                    down_port = mb.Port(anchor=C, orientation=[0, -1, 0], separation=0.075)
+                    down_port = mb.Port(anchor=C, 
+                    orientation=[0, -1, 0], separation=0.075)
                     C.add(down_port, 'down', containment=False)
                     new_group = deepcopy(group)
                     Top.add(new_group)
@@ -201,11 +202,13 @@ class GraphenePoreFunctionalized(mb.Compound):
             roll = np.random.rand()
             for chance, group, port in zip(cdf, func_groups, func_ports):
                 if roll <= chance:
-                    up_port = mb.Port(anchor=C, orientation=[0, 1, 0], separation=0.075)
+                    up_port = mb.Port(anchor=C, 
+                    orientation=[0, 1, 0], separation=0.075)
                     C.add(up_port, 'up', containment=False)
                     new_group = deepcopy(group)
                     Bot.add(new_group)
-                    mb.force_overlap(new_group, new_group.labels[port], C.labels['up'])
+                    mb.force_overlap(new_group, new_group.labels[port], 
+                    C.labels['up'])
                     break
 
         for child in pore.children:
