@@ -1,5 +1,6 @@
 import mbuild as mb
 import numpy as np
+from random import shuffle
 from copy import deepcopy
 from six import string_types
 
@@ -112,7 +113,6 @@ class GraphenePoreSolvent(mb.Compound):
         self.periodicity = box.maxs
 
 
-
 class GraphenePoreFunctionalized(mb.Compound):
     """A general slit pore recipe that functionalizes the inner surfaces
 
@@ -164,11 +164,6 @@ class GraphenePoreFunctionalized(mb.Compound):
                 "If more than one port name or percent is given then "
                 "it must be specifeid for all functional groups")
 
-        cdf = deepcopy(func_percent)
-        for i in range(0, len(func_percent)):
-            if i != 0:
-                cdf[i] = sum(func_percent[0:i + 1])
-
         Top = pore.children[0]
         Bot = pore.children[1]
 
@@ -176,40 +171,29 @@ class GraphenePoreFunctionalized(mb.Compound):
         b_surface = []
 
         for C in Top:
-            if C.pos[0] >= 0 and C.pos[1] <= .336 * (n_sheets - 1) + pore_width
+            if C.pos[0] >= 0 and C.pos[1] <= .336 * (n_sheets - 1) + pore_width:
                 t_surface.append(C)
-
-        for C in t_surface:
-            roll = np.random.rand()
-            for chance, group, port in zip(cdf, func_groups, func_ports):
-                if roll <= chance:
-                    down_port = mb.Port(anchor=C, 
-                    orientation=[0, -1, 0], separation=0.075)
-                    C.add(down_port, 'down', containment=False)
-                    new_group = deepcopy(group)
-                    Top.add(new_group)
-                    mb.force_overlap(
-                        new_group,
-                        new_group.labels[port],
-                        C.labels['down'])
-                    break
-
+        
         for C in Bot:
             if C.pos[0] >= 0 and C.pos[1] >= .335 * (n_sheets - 1):
-                b_surface.append(C)
+                b_surface.append(C),
 
-        for C in b_surface:
-            roll = np.random.rand()
-            for chance, group, port in zip(cdf, func_groups, func_ports):
-                if roll <= chance:
-                    up_port = mb.Port(anchor=C, 
-                    orientation=[0, 1, 0], separation=0.075)
-                    C.add(up_port, 'up', containment=False)
-                    new_group = deepcopy(group)
-                    Bot.add(new_group)
+        for side, surface in zip((Top,Bot),(t_surface,b_surface)):
+            shuffle(surface)
+            queue = np.multiply(np.array(func_percent),(len(surface)))
+            queue = queue.astype(int)
+            start = [0]
+            for i in range(len(queue)-1):
+                start.append(queue[i])
+
+            for prev, n, group, port in zip(start, queue, func_groups, func_ports):                   
+                for i in range (prev,n):
+                    up_port = mb.Port(anchor=surface[i],orientation=[0, 1, 0], separation=0.075)
+                    surface[i].add(up_port, 'up', containment=False)
+                    new_group = mb.clone(group)
+                    side.add(new_group)
                     mb.force_overlap(new_group, new_group.labels[port], 
-                    C.labels['up'])
-                    break
+                    surface[i].labels['up'])
 
         for child in pore.children:
             self.add(mb.clone(child))
