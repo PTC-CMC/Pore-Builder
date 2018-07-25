@@ -170,15 +170,17 @@ class GraphenePoreFunctionalized(mb.Compound):
         t_surface = []
         b_surface = []
 
-        for C in Top:
-            if C.pos[0] >= 0 and C.pos[1] <= .336 * (n_sheets - 1) + pore_width:
-                t_surface.append(C)
-        
-        for C in Bot:
-            if C.pos[0] >= 0 and C.pos[1] >= .335 * (n_sheets - 1):
-                b_surface.append(C),
+        size = len(Top.xyz.T[1])
 
-        for side, surface in zip((Top,Bot),(t_surface,b_surface)):
+        for pos, i in zip(Top.xyz.T[1], range(0,size)):
+            if pos <= .336 * (n_sheets - 1) + pore_width:
+                t_surface.append(Top.children[i])
+        
+        for pos, i in zip(Bot.xyz.T[1], range(0,size)):
+            if pos >= .335 * (n_sheets - 1):
+                b_surface.append(Bot.children[i])
+
+        for side, surface, orientation_factor in zip((Top,Bot),(t_surface,b_surface),(-1,1)):
             shuffle(surface)
             queue = np.multiply(np.array(func_percent),(len(surface)))
             queue = queue.astype(int)
@@ -188,7 +190,7 @@ class GraphenePoreFunctionalized(mb.Compound):
 
             for prev, n, group, port in zip(start, queue, func_groups, func_ports):                   
                 for i in range (prev,n):
-                    up_port = mb.Port(anchor=surface[i],orientation=[0, 1, 0], separation=0.075)
+                    up_port = mb.Port(anchor=surface[i],orientation=[0, orientation_factor, 0], separation=0.075)
                     surface[i].add(up_port, 'up', containment=False)
                     new_group = mb.clone(group)
                     side.add(new_group)
