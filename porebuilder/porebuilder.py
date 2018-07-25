@@ -125,12 +125,12 @@ class GraphenePoreFunctionalized(mb.Compound):
         number of parallel graphene sheets
     pore_width: int, default=1
         width of slit pore in nm
-    func_groups : mb.Compound or List-like thereof, defualt=None
+    func_groups : mb.Compound or List-like thereof, default=None
         compounds to attach to the surface of a slit pore
-    func_ports : string or List-like thereof, defualt='up'
+    func_ports : string or List-like thereof, default='up'
         ports directly accesible by the func_groups that are the point of
          attachment to the pore
-    func_percent : float or List-like thereof, defualt=.03
+    func_percent : float or List-like thereof, default=.03
         percentage of surface to be functionalized by groups in func_groups
     NOTE: Both func_ports and func_percent must be in the same order as their
         corresponding functional group in func_groups. If only one value is
@@ -192,7 +192,7 @@ class GraphenePoreFunctionalized(mb.Compound):
             #The queue is a list containing the amount of each functional group 
             # to be added to the pore's surface. The start list will contain 0, 
             # the first index to work with and the numbers between function 
-            # groups. i.e. with a queue of [5,17,14] the start list ahould be 
+            # groups. i.e. with a queue of [5,17,14] the start list should be 
             # [0,5,22]
 
             queue = np.multiply(np.array(func_percent),(len(surface)))
