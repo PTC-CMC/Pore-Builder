@@ -203,10 +203,10 @@ class GraphenePoreFunctionalized(mb.Compound):
 
             for prev, n, group, port in zip(start, queue, func_groups, 
             func_ports):                   
-                for i in range (prev,n):
-                    up_port = mb.Port(anchor=surface[i],orientation=[0, 
+                for i in range (prev,n+prev):
+                    down_port = mb.Port(anchor=surface[i],orientation=[0, 
                     orientation_factor, 0], separation=0.075)
-                    surface[i].add(up_port, 'down', containment=False)
+                    surface[i].add(down_port, 'down', containment=False)
                     new_group = mb.clone(group)
                     pore_wall.add(new_group)
                     mb.force_overlap(new_group, new_group.labels[port], 
