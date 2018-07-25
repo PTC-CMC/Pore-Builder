@@ -170,6 +170,9 @@ class GraphenePoreFunctionalized(mb.Compound):
 
         size = len(Top.xyz.T[1])
 
+        #These two for loops selected the inner surfaces of the graphene pore
+        #by searching through the array of all y positions. 
+
         for pos, i in zip(Top.xyz.T[1], range(0,size)):
             if pos <= .336 * (n_sheets - 1) + pore_width:
                 t_surface.append(Top.children[i])
@@ -178,17 +181,31 @@ class GraphenePoreFunctionalized(mb.Compound):
             if pos >= .335 * (n_sheets - 1):
                 b_surface.append(Bot.children[i])
 
-        for pore_wall, surface, orientation_factor in zip((Top,Bot),(t_surface,b_surface),(-1,1)):
+        #The pore is then functionalized randomly, the rng being taken care of 
+        #by random.shuffle. THis method should get as close to the desired 
+        #percent functionalization as possible.
+
+        for pore_wall, surface, orientation_factor in zip((Top,Bot),(t_surface,
+        b_surface),(-1,1)):
             shuffle(surface)
+
+            #The queue is a list containing the amount of each functional group 
+            # to be added to the pore's surface. The start list will contain 0, 
+            # the first index to work with and the numbers between function 
+            # groups. i.e. with a queue of [5,17,14] the start list ahould be 
+            # [0,5,22]
+
             queue = np.multiply(np.array(func_percent),(len(surface)))
             queue = queue.astype(int)
             start = [0]
             for i in range(len(queue)-1):
-                start.append(queue[i])
+                start.append(sum(start) + queue[i])
 
-            for prev, n, group, port in zip(start, queue, func_groups, func_ports):                   
+            for prev, n, group, port in zip(start, queue, func_groups, 
+            func_ports):                   
                 for i in range (prev,n):
-                    up_port = mb.Port(anchor=surface[i],orientation=[0, orientation_factor, 0], separation=0.075)
+                    up_port = mb.Port(anchor=surface[i],orientation=[0, 
+                    orientation_factor, 0], separation=0.075)
                     surface[i].add(up_port, 'down', containment=False)
                     new_group = mb.clone(group)
                     pore_wall.add(new_group)
