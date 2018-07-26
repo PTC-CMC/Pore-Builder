@@ -102,3 +102,5 @@ class TestPoreBuilder(BaseTest):
         assert(np.amax(positions[0]) <= 2)
         assert(np.amin(positions[2]) >= -(0.0001))
         assert(np.amax(positions[2]) <= 2)
+
+        assert(odd_pore.n_bonds == 140)

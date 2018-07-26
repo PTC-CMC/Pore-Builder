@@ -162,38 +162,39 @@ class GraphenePoreFunctionalized(mb.Compound):
                 "If more than one port name or percent is given then "
                 "it must be specifeid for all functional groups")
 
-        Top = pore.children[0]
-        Bot = pore.children[1]
+        top = pore.children[0]
+        bot = pore.children[1]
 
         t_surface = []
         b_surface = []
 
-        size = len(Top.xyz.T[1])
+        size = len(top.xyz.T[1])
 
         #These two for loops selected the inner surfaces of the graphene pore
         #by searching through the array of all y positions. 
 
-        for pos, i in zip(Top.xyz.T[1], range(0,size)):
+        for pos, i in zip(top.xyz.T[1], range(0,size)):
             if pos <= .336 * (n_sheets - 1) + pore_width:
-                t_surface.append(Top.children[i])
+                t_surface.append(top.children[i])
         
-        for pos, i in zip(Bot.xyz.T[1], range(0,size)):
+        for pos, i in zip(bot.xyz.T[1], range(0,size)):
             if pos >= .335 * (n_sheets - 1):
-                b_surface.append(Bot.children[i])
+                b_surface.append(bot.children[i])
 
         #The pore is then functionalized randomly, the rng being taken care of 
         #by random.shuffle. THis method should get as close to the desired 
         #percent functionalization as possible.
 
-        for pore_wall, surface, orientation_factor in zip((Top,Bot),(t_surface,
+        for pore_wall, surface, orientation_factor in zip((top,bot),(t_surface,
         b_surface),(-1,1)):
+        
             shuffle(surface)
 
             #The queue is a list containing the amount of each functional group 
-            # to be added to the pore's surface. The start list will contain 0, 
-            # the first index to work with and the numbers between function 
-            # groups. i.e. with a queue of [5,17,14] the start list should be 
-            # [0,5,22]
+            #to be added to the pore's surface. The start list will contain 0, 
+            #the first index to work with and the numbers between function 
+            #groups. i.e. with a queue of [5,17,14] the start list should be 
+            #[0,5,22]
 
             queue = np.multiply(np.array(func_percent),(len(surface)))
             queue = queue.astype(int)
