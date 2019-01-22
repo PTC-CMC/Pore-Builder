@@ -12,10 +12,10 @@ class TestPoreBuilder(BaseTest):
     """
 
     def test_save_dry(self, GraphenePore):
-        GraphenePore.save(filename='dry_pore.gro')
+        GraphenePore.save(filename='dry_pore.gro', combine='all')
 
     def test_save_solvated(self, GraphenePoreSolvent):
-        GraphenePoreSolvent.save(filename='solvated_pore.gro')
+        GraphenePoreSolvent.save(filename='solvated_pore.gro', combine='all')
 
     def test_hierarchy_dry(self, GraphenePore):
         assert len(GraphenePore.children) == 2
