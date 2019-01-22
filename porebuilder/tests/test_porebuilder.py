@@ -1,6 +1,9 @@
 import numpy as np
 import mbuild as mb
+import pytest
+
 from porebuilder.tests.base_test import BaseTest
+import porebuilder as pb
 
 
 class TestPoreBuilder(BaseTest):
@@ -50,3 +53,54 @@ class TestPoreBuilder(BaseTest):
             assert particle.xyz[0][0] < box.maxs[0]
             assert particle.xyz[0][1] < box.maxs[1]
             assert particle.xyz[0][2] < box.maxs[2]
+
+    def test_functionalize_surface(self):
+
+        class H(mb.Compound):
+            def __init__(self):
+                super(H, self).__init__()
+
+                self.add(mb.Particle(name='H'))
+                up_port = mb.Port(
+                    anchor=self[0], orientation=[
+                        0, 1, 0], separation=.075)
+                self.add(up_port, "up")
+
+        class O(mb.Compound):
+            def __init__(self):
+                super(O, self).__init__()
+
+                self.add(mb.Particle(name='O'))
+                up_port = mb.Port(
+                    anchor=self[0], orientation=[
+                        0, 1, 0], separation=.075)
+                self.add(up_port, "up")
+
+        with pytest.raises(ValueError):
+            pb.GraphenePoreFunctionalized(
+                func_groups=[H(), O()], func_percent=[.03, .04, .03])
+
+        for per in range(0, 3):
+            per = per * 3 + 1 
+            pore = pb.GraphenePoreFunctionalized(
+                func_groups=H(), func_percent= per / 10)
+            assert(pore.n_particles - 2688 >= (per - .15) / 10 * 864) 
+            assert(pore.n_particles - 2688 <= (per + .15) / 10 * 864)
+
+        odd_pore = pb.GraphenePoreFunctionalized(n_sheets=4, pore_width=1.5,pore_depth=2, side_dim=2, func_groups=H(), func_percent=.5)
+        
+        hydrogens = odd_pore.particles_by_name('H')
+        positions = [[],[],[]]
+        for h in hydrogens:
+            for array in h.xyz:
+                for d,i in zip(array,range(0,3)):
+                    positions[i].append(d)
+        
+        assert(np.amin(positions[1]) >= .335 * (3))
+        assert(np.amax(positions[1]) <= .336 * (3) + 1.5)
+        assert(np.amin(positions[0]) >= -(0.0001))
+        assert(np.amax(positions[0]) <= 2)
+        assert(np.amin(positions[2]) >= -(0.0001))
+        assert(np.amax(positions[2]) <= 2)
+
+        assert(odd_pore.n_bonds == 140)

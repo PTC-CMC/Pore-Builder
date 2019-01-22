@@ -4,3 +4,4 @@ mbuild
 mdtraj
 parmed
 setuptools
+sixs

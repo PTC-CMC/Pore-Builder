@@ -1,5 +1,7 @@
 import mbuild as mb
 import numpy as np
+from random import shuffle
+from six import string_types
 
 __all__ = ['GraphenePoreSolvent', 'GraphenePore']
 
@@ -108,3 +110,108 @@ class GraphenePoreSolvent(mb.Compound):
             self.add(mb.clone(child))
 
         self.periodicity = box.maxs
+
+
+class GraphenePoreFunctionalized(mb.Compound):
+    """A general slit pore recipe that functionalizes the inner surfaces
+
+    Parameters
+    ----------
+    pore_depth : int, default=4
+        dimensions of graphene sheet in x direction in nm
+    side_dim : int, default=4
+        dimensions of graphene sheet in z direction in nm
+    n_sheets : int, default=3
+        number of parallel graphene sheets
+    pore_width: int, default=1
+        width of slit pore in nm
+    func_groups : mb.Compound or List-like thereof, default=None
+        compounds to attach to the surface of a slit pore
+    func_ports : string or List-like thereof, default='up'
+        ports directly accesible by the func_groups that are the point of
+         attachment to the pore
+    func_percent : float or List-like thereof, default=.03
+        percentage of surface to be functionalized by groups in func_groups
+    NOTE: Both func_ports and func_percent must be in the same order as their
+        corresponding functional group in func_groups. If only one value is
+        given for either func_ports or func_percent that value will be used for all
+        compounds in func_groups.
+    Attributes
+    ----------
+    see mbuild.Compound
+
+    """
+
+    def __init__(self, pore_depth=4, side_dim=3, n_sheets=3, pore_width=1,
+                 func_groups=None, func_percent=.03, func_ports='up'):
+
+        super(GraphenePoreFunctionalized, self).__init__()
+
+        pore = GraphenePore(pore_depth=pore_depth, side_dim=side_dim,
+                            n_sheets=n_sheets, pore_width=pore_width)
+
+        if isinstance(func_groups, mb.Compound):
+            func_groups = [func_groups]
+        if isinstance(func_percent, float):
+            func_percent = [func_percent] * len(func_groups)
+        if isinstance(func_ports, string_types):
+            func_ports = [func_ports] * len(func_groups)
+
+        if not len(func_groups) == len(func_percent) == len(func_ports):
+            raise ValueError(
+                "If more than one port name or percent is given then "
+                "it must be specifeid for all functional groups")
+
+        top = pore.children[0]
+        bot = pore.children[1]
+
+        t_surface = []
+        b_surface = []
+
+        size = len(top.xyz.T[1])
+
+        #These two for loops selected the inner surfaces of the graphene pore
+        #by searching through the array of all y positions. 
+
+        for pos, i in zip(top.xyz.T[1], range(0,size)):
+            if pos <= .336 * (n_sheets - 1) + pore_width:
+                t_surface.append(top.children[i])
+        
+        for pos, i in zip(bot.xyz.T[1], range(0,size)):
+            if pos >= .335 * (n_sheets - 1):
+                b_surface.append(bot.children[i])
+
+        #The pore is then functionalized randomly, the rng being taken care of 
+        #by random.shuffle. THis method should get as close to the desired 
+        #percent functionalization as possible.
+
+        for pore_wall, surface, orientation_factor in zip((top,bot),(t_surface,
+        b_surface),(-1,1)):
+        
+            shuffle(surface)
+
+            #The queue is a list containing the amount of each functional group 
+            #to be added to the pore's surface. The start list will contain 0, 
+            #the first index to work with and the numbers between function 
+            #groups. i.e. with a queue of [5,17,14] the start list should be 
+            #[0,5,22]
+
+            queue = np.multiply(np.array(func_percent),(len(surface)))
+            queue = queue.astype(int)
+            start = [0]
+            for i in range(len(queue)-1):
+                start.append(sum(start) + queue[i])
+
+            for prev, n, group, port in zip(start, queue, func_groups, 
+            func_ports):                   
+                for i in range (prev,n+prev):
+                    down_port = mb.Port(anchor=surface[i],orientation=[0, 
+                    orientation_factor, 0], separation=0.075)
+                    surface[i].add(down_port, 'down', containment=False)
+                    new_group = mb.clone(group)
+                    pore_wall.add(new_group)
+                    mb.force_overlap(new_group, new_group.labels[port], 
+                    surface[i].labels['down'])
+
+        for child in pore.children:
+            self.add(mb.clone(child))
