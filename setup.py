@@ -12,7 +12,7 @@ setup(name='porebuilder',
         entry_points={
             'mbuild.plugins':[
             "GraphenePore = porebuilder.porebuilder:GraphenePore",
-            "GraphenePoreSolvent = porebuilder.porebuilder:GraphenePore",
+            "GraphenePoreSolvent = porebuilder.porebuilder:GraphenePoreSolvent",
             ]
         }
     )
