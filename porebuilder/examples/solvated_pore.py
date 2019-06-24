@@ -1,4 +1,3 @@
-from porebuilder import GraphenePoreSolvent
 import mbuild as mb
 from foyer import Forcefield
 
@@ -11,7 +10,7 @@ C = Forcefield('files/carbon.xml')
 SPCE = Forcefield('files/spce.xml')
 OPLS = Forcefield(name='oplsaa')
 
-system = GraphenePoreSolvent(pore_depth=4, side_dim=4, n_sheets=3,
+system = mb.recipes.GraphenePoreSolvent(pore_depth=4, side_dim=4, n_sheets=3,
                              pore_width=1.2, x_bulk=3, solvent=[water, acn],
                              n_solvent=[1, 1])
 
