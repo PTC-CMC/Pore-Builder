@@ -4,4 +4,5 @@
 An mBuild recipe to build graphene slit pores.  See
 http://mosdef-hub.github.io/mbuild/ for more information
 
-![image](https://user-images.githubusercontent.com/25011342/68546316-e6ccfb00-03a2-11ea-8bc3-a4c13aa2a92c.png)
+![image](https://user-images.githubusercontent.com/25011342/68546370-838f9880-03a3-11ea-8db6-232c0d7a6dff.png)
+
