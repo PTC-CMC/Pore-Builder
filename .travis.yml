@@ -4,8 +4,8 @@ sudo: false
 
 matrix:
   include:
-    - { os: linux, env: PYTHON_VERSION=3.5 }
-    - { os: osx, env: PYTHON_VERSION=3.5 }
+    - { os: linux, env: PYTHON_VERSION=3.6 }
+    - { os: osx, env: PYTHON_VERSION=3.6 }
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
