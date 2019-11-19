@@ -8,4 +8,11 @@ setup(name='porebuilder',
         author_email='raymatsum@gmail.com',
         license='MIT',
         packages=['porebuilder'],
-        zip_safe=False)
+        zip_safe=False,
+        entry_points={
+            'mbuild.plugins':[
+            "GraphenePore = porebuilder.porebuilder:GraphenePore",
+            "GraphenePoreSolvent = porebuilder.porebuilder:GraphenePoreSolvent",
+            ]
+        }
+    )

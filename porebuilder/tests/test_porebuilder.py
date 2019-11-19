@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 import mbuild as mb
 from porebuilder.tests.base_test import BaseTest
@@ -7,6 +9,11 @@ class TestPoreBuilder(BaseTest):
     """
     Unit Tests for Pore class functionality.
     """
+
+    def test_imports(self):
+        assert 'porebuilder' in sys.modules
+        assert 'GraphenePore' in vars(mb.recipes).keys()
+        assert 'GraphenePoreSolvent' in vars(mb.recipes).keys()
 
     def test_save_dry(self, GraphenePore):
         GraphenePore.save(filename='dry_pore.gro', combine='all')
