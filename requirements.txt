@@ -3,4 +3,5 @@ pytest
 mbuild
 mdtraj
 parmed
+openbabel
 setuptools
