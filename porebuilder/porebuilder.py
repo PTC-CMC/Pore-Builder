@@ -9,27 +9,29 @@ class GraphenePore(mb.Compound):
 
     Parameters
     ----------
+    pore_length : int, default=4
+        dimensions of graphene sheet length in nm
     pore_depth : int, default=4
-        dimensions of graphene sheet in x direction in nm
-    side_dim : int, default=4
-        dimensions of graphene sheet in z direction in nm
+        dimensions of graphene sheet depth in nm
     n_sheets : int, default=3
         number of parallel graphene sheets
     pore_width: int, default=1
         width of slit pore in nm
+    slit_pore_dim : int, default=1
+        dimension slit pore, default is in the y-axis
 
     Attributes
     ----------
     see mbuild.Compound
 
     """
-    def __init__(self, pore_depth=4, side_dim=3, n_sheets=3, pore_width=1):
+    def __init__(self, pore_length=4, pore_depth=3, n_sheets=3, pore_width=1, slit_pore_dim=1):
         super(GraphenePore, self).__init__()
 
         factor = np.cos(np.pi/6)
         # Estimate the number of lattice repeat units
-        replicate = [int(pore_depth/0.2456), (side_dim/0.2456)*(1/factor)]
-        if all(x <= 0 for x in [pore_depth, side_dim]):
+        replicate = [int(pore_length/0.2456), (pore_depth/0.2456)*(1/factor)]
+        if all(x <= 0 for x in [pore_length, pore_depth]):
             msg = 'Dimension of graphene sheet must be greater than zero'
             raise ValueError(msg)
         carbon = mb.Compound()
@@ -51,17 +53,33 @@ class GraphenePore(mb.Compound):
                 particle.xyz[0][0] += graphene.periodicity[0]
         graphene.periodicity[1] *= factor  # cos(30)*.246
         bot_sheet = mb.clone(graphene)
-        bot_sheet.spin(1.5708, [1, 0, 0])
         bot_sheet.name = 'BOT'
         top_sheet = mb.clone(graphene)
-        top_sheet.spin(1.5708, [1, 0, 0])
-        top_sheet.translate([0, pore_width + (graphene.periodicity[2] - 0.335), 0])
+        if slit_pore_dim == 0:
+            bot_sheet.spin(1.5708, [0, 1, 0])
+            top_sheet.spin(1.5708, [0, 1, 0])
+            top_sheet.translate([pore_width + (graphene.periodicity[2] - 0.335), 0, 0])
+        elif slit_pore_dim == 1:
+            bot_sheet.spin(1.5708, [1, 0, 0])
+            top_sheet.spin(1.5708, [1, 0, 0])
+            top_sheet.translate([0, pore_width + (graphene.periodicity[2] - 0.335), 0])
+        elif slit_pore_dim == 2:
+            top_sheet.translate([0, 0, pore_width + (graphene.periodicity[2] - 0.335)])
         top_sheet.name = 'TOP'
         self.add(top_sheet)
         self.add(bot_sheet)
-        self.periodicity[0] = graphene.periodicity[0]
-        self.periodicity[1] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
-        self.periodicity[2] = graphene.periodicity[1]
+        if slit_pore_dim == 0:
+            self.periodicity[0] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
+            self.periodicity[1] = graphene.periodicity[0]
+            self.periodicity[2] = graphene.periodicity[1]
+        elif slit_pore_dim == 1:
+            self.periodicity[0] = graphene.periodicity[0]
+            self.periodicity[1] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
+            self.periodicity[2] = graphene.periodicity[1]
+        elif slit_pore_dim == 2:
+            self.periodicity[0] = graphene.periodicity[0]
+            self.periodicity[1] = graphene.periodicity[1]
+            self.periodicity[2] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
         self.xyz -= np.min(self.xyz, axis=0)
 
 
@@ -70,14 +88,16 @@ class GraphenePoreSolvent(mb.Compound):
 
     Parameters
     ----------
+    pore_length : int, default=4
+        dimensions of graphene sheet length in nm
     pore_depth : int, default=4
-        dimensions of graphene sheet in x direction in nm
-    side_dim : int, default=4
-        dimensions of graphene sheet in z direction in nm
+        dimensions of graphene sheet depth in nm
     n_sheets : int, default=3
         number of parallel graphene sheets
     pore_width: int, default=1
         width of slit pore in nm
+    slit_pore_dim : int, default=1
+        dimension slit pore, default is in the y-axis
     x_bulk : int, default=3
         length of bulk region in x-direction in nm
     solvent : list of mbuild.Compound
@@ -91,12 +111,12 @@ class GraphenePoreSolvent(mb.Compound):
     see mbuild.Compound
 
     """
-    def __init__(self, pore_depth=4, side_dim=3, n_sheets=3, pore_width=1,
-                 x_bulk=3, solvent=None, n_solvent=100):
+    def __init__(self, pore_length=4, pore_depth=3, n_sheets=3, pore_width=1,
+                 x_bulk=3, slit_pore_dim=1, solvent=None, n_solvent=100):
 
         super(GraphenePoreSolvent, self).__init__()
 
-        pore = GraphenePore(pore_depth=pore_depth, side_dim=side_dim,
+        pore = GraphenePore(pore_length=pore_length, pore_depth=pore_depth,
                             n_sheets=n_sheets, pore_width=pore_width)
 
         box = mb.Box(pore.periodicity)
