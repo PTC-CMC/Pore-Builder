@@ -13,6 +13,7 @@ setup(name='porebuilder',
             'mbuild.plugins':[
             "GraphenePore = porebuilder.porebuilder:GraphenePore",
             "GraphenePoreSolvent = porebuilder.porebuilder:GraphenePoreSolvent",
+            "GrapheneSurface = porebuilder.porebuilder:GrapheneSurface",
             ]
         }
     )

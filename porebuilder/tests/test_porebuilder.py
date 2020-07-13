@@ -21,6 +21,9 @@ class TestPoreBuilder(BaseTest):
     def test_save_solvated(self, GraphenePoreSolvent):
         GraphenePoreSolvent.save(filename='solvated_pore.gro', combine='all')
 
+    def test_save_surface(self, GrapheneSurface):
+        GrapheneSurface.save(filename='graphene_surface.gro', combine='all')
+
     def test_hierarchy_dry(self, GraphenePore):
         assert len(GraphenePore.children) == 2
 
@@ -35,6 +38,21 @@ class TestPoreBuilder(BaseTest):
         bot_y = np.max(bot.xyz[:, 1])
         top_y = np.min(top.xyz[:, 1])
         assert np.isclose(top_y - bot_y, 1.0, 3)
+
+    def test_surfacewidth(self, GrapheneSurface):
+        graphene = next(c for c in GrapheneSurface.children)
+        x_length = np.ptp(graphene.xyz[:, 0])
+        y_length = np.ptp(graphene.xyz[:, 1])
+
+        assert np.isclose(x_length, 3, 1)
+        assert np.isclose(y_length, 3, 1)
+
+    def test_surfacevacuum(self, GrapheneSurface):
+        graphene = next(c for c in GrapheneSurface.children)
+        z_length = np.max(graphene.xyz[:, 2])
+
+        assert GrapheneSurface.periodicity[2] == z_length + 5.0
+
 
     def test_sheet_dims(self, GraphenePore):
         bot = next(c for c in GraphenePore.children if c.name == 'BOT')
