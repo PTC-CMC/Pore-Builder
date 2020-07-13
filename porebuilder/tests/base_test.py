@@ -25,3 +25,8 @@ class BaseTest:
         return GraphenePoreSolvent(pore_length=3, pore_depth=3, n_sheets=3,
                                    pore_width=1, x_bulk=3, solvent=[h2o],
                                    n_solvent=10)
+
+    @pytest.fixture
+    def GrapheneSurface(self):
+        from porebuilder.porebuilder import GrapheneSurface
+        return GrapheneSurface(x_length=3, y_length=2, n_sheets=3, vacuum=5.0)
