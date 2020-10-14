@@ -117,7 +117,8 @@ class GraphenePoreSolvent(mb.Compound):
         super(GraphenePoreSolvent, self).__init__()
 
         pore = GraphenePore(pore_length=pore_length, pore_depth=pore_depth,
-                            n_sheets=n_sheets, pore_width=pore_width)
+                            n_sheets=n_sheets, pore_width=pore_width,
+                            slit_pore_dim=slit_pore_dim)
 
         box = mb.Box(pore.periodicity)
         if x_bulk != 0:
