@@ -2,6 +2,7 @@ import sys
 
 import numpy as np
 import mbuild as mb
+import pytest
 from porebuilder.tests.base_test import BaseTest
 
 
@@ -75,3 +76,14 @@ class TestPoreBuilder(BaseTest):
             assert particle.xyz[0][0] < box.maxs[0]
             assert particle.xyz[0][1] < box.maxs[1]
             assert particle.xyz[0][2] < box.maxs[2]
+
+    def test_dimension_error(self):
+        from porebuilder.porebuilder import GraphenePore, GrapheneSurface
+        with pytest.raises(ValueError):
+            GraphenePore(pore_length=0, pore_depth=0, n_sheets=3, pore_width=1)
+            GrapheneSurface(x_length=0, y_length=0)
+
+    @pytest.mark.parametrize("dim", (0, 1, 2))
+    def test_slitpore_dims(self, dim):
+        from porebuilder.porebuilder import GraphenePore, GrapheneSurface
+        GraphenePore(slit_pore_dim=dim)
