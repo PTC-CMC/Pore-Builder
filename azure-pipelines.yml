@@ -63,7 +63,7 @@ stages:
           - bash: |
               source activate test-environment
               pip install pytest-azurepipelines
-              python -m pytest -v --pyargs porebuilder -cov=./
+              python -m pytest -v --pyargs porebuilder --cov=./
             displayName: Run Tests
           - bash: |
               source activate test-environment
