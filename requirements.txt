@@ -1,4 +1,6 @@
 numpy
+codecov
+pytest-cov
 pytest
 mbuild
 mdtraj
