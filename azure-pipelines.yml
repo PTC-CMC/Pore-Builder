@@ -63,13 +63,12 @@ stages:
           - bash: |
               source activate test-environment
               pip install pytest-azurepipelines
-              python -m pytest -v --pyargs porebuilder -cov=porebuilder --no-coverage-upload
+              python -m pytest -v --pyargs porebuilder -cov=./
             displayName: Run Tests
           - bash: |
               source activate test-environment
               coverage xml
               codecov --file ./coverage.xml --token 1523ae51-ce3c-4371-aedb-1608c997fa94
-              coverate html
             condition: and( eq( variables['Agent.OS'], 'Linux' ), eq( variables['python.version'], '3.7' ) )
           - task: PublishCodeCoverageResults@1
             inputs:
