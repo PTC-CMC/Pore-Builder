@@ -1,7 +1,9 @@
 numpy
+codecov
+pytest-cov
 pytest
 mbuild
 mdtraj
 parmed
-openbabel
+openbabel>=3.0.0
 setuptools

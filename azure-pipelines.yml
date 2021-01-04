@@ -1,0 +1,79 @@
+trigger:
+  branches:
+    include:
+    - master
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - master
+
+schedules:
+- cron: "0 0 * * *"
+  displayName: Daily midnight build for master
+  branches:
+    include:
+    - master
+  always: true
+
+
+stages:
+  - stage: Test
+    jobs:
+      - job: NoBleeding
+        strategy:
+          matrix:
+            Python37Ubuntu:
+              imageName: 'ubuntu-latest'
+              python.version: 3.7
+            Python38Ubuntu:
+              imageName: 'ubuntu-latest'
+              python.version: 3.8
+            Python37macOS:
+              imageName: 'macOS-latest'
+              python.version: 3.7
+            Python38macOS:
+              imageName: 'macOS-latest'
+              python.version: 3.8
+
+        pool:
+          vmImage: $(imageName)
+
+        steps:
+          - bash: echo "##vso[task.prependpath]$CONDA/bin"
+            displayName: Add Conda to path
+
+          - bash: sudo chown -R $USER $CONDA
+            condition: eq( variables['Agent.OS'], 'Darwin' )
+            displayName: Take ownership of conda installation
+
+          - bash: |
+              conda config --set always_yes yes --set changeps1 no
+              conda config --add channels conda-forge
+            displayName: Add relavent Channels
+          - bash: |
+              conda update -c defaults conda
+              conda update --all
+              conda create -n test-environment
+              source activate test-environment
+              conda install --yes python=$(python.version) --file requirements.txt
+              pip install -e .
+            displayName: Create Conda env, Activate, Install dependencies, Install Branch
+          - bash: |
+              source activate test-environment
+              pip install pytest-azurepipelines
+              python -m pytest -v --pyargs porebuilder --cov=./
+            displayName: Run Tests
+          - bash: |
+              source activate test-environment
+              coverage xml
+              codecov --file ./coverage.xml --token 1523ae51-ce3c-4371-aedb-1608c997fa94
+            condition: and( eq( variables['Agent.OS'], 'Linux' ), eq( variables['python.version'], '3.7' ) )
+          - task: PublishCodeCoverageResults@1
+            inputs:
+              codeCoverageTool: Cobertura
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+              reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
+            condition: and( eq( variables['Agent.OS'], 'Linux' ), eq( variables['python.version'], '3.7' ) )
+            displayName: Publish Coverage Report
