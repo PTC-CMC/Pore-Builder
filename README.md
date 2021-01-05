@@ -4,7 +4,7 @@
 
 ## Overview
 
-`Pore-Builder` is an ![mBuild](http://mosdef-hub.github.io/mbuild/) recipe to build carbon slit pores and surfaces.
+`Pore-Builder` is an [mBuild](http://mosdef-hub.github.io/mbuild/) recipe to build carbon slit pores and surfaces.
 Recipes are designed to be add-ons, allowing users to develop routines to initialize specific chemistries using mBuild.
 
 ## Installation
