@@ -23,8 +23,6 @@ To check the package has been correctly installed, we can run Python and attempt
 ```
 >>> import mbuild
 >>> mbuild.recipes.GraphenePore()
-/Users/raymatsumoto/anaconda3/envs/science37/lib/python3.7/site-packages/mbuild/lattice.py:626: UserWarning: Periodicity of non-rectangular lattices are not valid with default boxes. Only rectangular lattices are valid at this time.
-  warn('Periodicity of non-rectangular lattices are not valid with '
 <GraphenePore 2688 particles, periodicity: [3.9296     2.675      2.97774175], 0 bonds, id: 140234327632848>
 >>> 
 ```
