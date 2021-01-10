@@ -73,9 +73,9 @@ class TestPoreBuilder(BaseTest):
         box = mb.Box(GraphenePoreSolvent.periodicity)
 
         for particle in GraphenePoreSolvent.particles():
-            assert particle.xyz[0][0] < box.maxs[0]
-            assert particle.xyz[0][1] < box.maxs[1]
-            assert particle.xyz[0][2] < box.maxs[2]
+            assert particle.xyz[0][0] <= box.maxs[0]
+            assert particle.xyz[0][1] <= box.maxs[1]
+            assert particle.xyz[0][2] <= box.maxs[2]
 
     def test_dimension_error(self):
         from porebuilder.porebuilder import GraphenePore, GrapheneSurface
@@ -85,5 +85,12 @@ class TestPoreBuilder(BaseTest):
 
     @pytest.mark.parametrize("dim", (0, 1, 2))
     def test_slitpore_dims(self, dim):
-        from porebuilder.porebuilder import GraphenePore, GrapheneSurface
+        from porebuilder.porebuilder import GraphenePore
         GraphenePore(slit_pore_dim=dim)
+
+    @pytest.mark.parametrize("dim", (0, 1, 2))
+    def test_box_center(self, dim):
+        from porebuilder.porebuilder import GraphenePore
+        pore = GraphenePore(slit_pore_dim=dim)
+        
+        assert np.allclose(pore.center, np.max(pore.xyz, axis=0)/2)

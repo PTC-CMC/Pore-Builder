@@ -68,19 +68,10 @@ class GraphenePore(mb.Compound):
         top_sheet.name = 'TOP'
         self.add(top_sheet)
         self.add(bot_sheet)
-        if slit_pore_dim == 0:
-            self.periodicity[0] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
-            self.periodicity[1] = graphene.periodicity[0]
-            self.periodicity[2] = graphene.periodicity[1]
-        elif slit_pore_dim == 1:
-            self.periodicity[0] = graphene.periodicity[0]
-            self.periodicity[1] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
-            self.periodicity[2] = graphene.periodicity[1]
-        elif slit_pore_dim == 2:
-            self.periodicity[0] = graphene.periodicity[0]
-            self.periodicity[1] = graphene.periodicity[1]
-            self.periodicity[2] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
         self.xyz -= np.min(self.xyz, axis=0)
+        self.periodicity[0] = np.max(self.xyz[:,0])
+        self.periodicity[1] = np.max(self.xyz[:,1])
+        self.periodicity[2] = np.max(self.xyz[:,2])
 
 
 class GraphenePoreSolvent(mb.Compound):
