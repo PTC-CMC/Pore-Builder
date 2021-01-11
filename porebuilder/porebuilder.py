@@ -130,7 +130,7 @@ class GraphenePoreSolvent(mb.Compound):
         for child in system.children:
             self.add(mb.clone(child))
 
-        #self.periodicity = box.maxs
+        self.periodicity = box.maxs
 
 
 class GrapheneSurface(mb.Compound):
