@@ -81,6 +81,8 @@ class GraphenePore(mb.Compound):
             self.periodicity[1] = graphene.periodicity[1]
             self.periodicity[2] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
         self.xyz -= np.min(self.xyz, axis=0)
+        recenter = (self.periodicity - np.max(self.xyz, axis=0)) / 2
+        self.xyz += recenter
 
 
 class GraphenePoreSolvent(mb.Compound):
@@ -119,7 +121,6 @@ class GraphenePoreSolvent(mb.Compound):
         pore = GraphenePore(pore_length=pore_length, pore_depth=pore_depth,
                             n_sheets=n_sheets, pore_width=pore_width,
                             slit_pore_dim=slit_pore_dim)
-
         box = mb.Box(pore.periodicity)
         if x_bulk != 0:
             box.maxs[0] += 2 * x_bulk
@@ -129,7 +130,7 @@ class GraphenePoreSolvent(mb.Compound):
         for child in system.children:
             self.add(mb.clone(child))
 
-        self.periodicity = box.maxs
+        #self.periodicity = box.maxs
 
 
 class GrapheneSurface(mb.Compound):
