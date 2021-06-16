@@ -7,6 +7,10 @@
 `Pore-Builder` is an [mBuild](http://mosdef-hub.github.io/mbuild/) recipe to build carbon slit pores and surfaces.
 Recipes are designed to be add-ons, allowing users to develop routines to initialize specific chemistries using mBuild.
 
+## Disclaimer
+Continuous integration pipelines on Azure are currently not working.  The Azure organization for this project may have been inadvertently flagged due
+to attempts to cut down on abuse, such as crypto mining, in recent months.  See: https://devblogs.microsoft.com/devops/change-in-azure-pipelines-grant-for-public-projects/. A ticket has been submitted to resolve this issue.
+
 ## Installation
 To install `Pore-Builder`, its dependencies must first be installed.  It is recommended to do so through Conda by running the
 following commands:
