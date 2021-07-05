@@ -1,9 +1,9 @@
-from porebuilder import GraphenePore
+import mbuild as mb
 from foyer import Forcefield
 
 C = Forcefield('files/carbon.xml')
 
-system = GraphenePore(pore_depth=4, side_dim=2, n_sheets=3, pore_width=1.2)
+system = mb.recipes.GraphenePore(pore_depth=4, side_dim=2, n_sheets=3, pore_width=1.2)
 
 system = C.apply(system)
 
