@@ -50,37 +50,56 @@ class GraphenePore(mb.Compound):
 
         for particle in graphene.particles():
             if particle.xyz[0][0] < 0:
-                particle.xyz[0][0] += graphene.periodicity[0]
-        graphene.periodicity[1] *= factor  # cos(30)*.246
+                particle.xyz[0][0] += graphene.box.Lx
+
         bot_sheet = mb.clone(graphene)
         bot_sheet.name = 'BOT'
         top_sheet = mb.clone(graphene)
         if slit_pore_dim == 0:
             bot_sheet.spin(1.5708, [0, 1, 0])
             top_sheet.spin(1.5708, [0, 1, 0])
-            top_sheet.translate([pore_width + (graphene.periodicity[2] - 0.335), 0, 0])
+            top_sheet.translate([pore_width + (graphene.box.Lz - 0.335), 0, 0])
         elif slit_pore_dim == 1:
             bot_sheet.spin(1.5708, [1, 0, 0])
             top_sheet.spin(1.5708, [1, 0, 0])
-            top_sheet.translate([0, pore_width + (graphene.periodicity[2] - 0.335), 0])
+            top_sheet.translate([0, pore_width + (graphene.box.Lz - 0.335), 0])
         elif slit_pore_dim == 2:
-            top_sheet.translate([0, 0, pore_width + (graphene.periodicity[2] - 0.335)])
+            top_sheet.translate([0, 0, pore_width + (graphene.box.Lz - 0.335)])
         top_sheet.name = 'TOP'
         self.add(top_sheet)
         self.add(bot_sheet)
         if slit_pore_dim == 0:
-            self.periodicity[0] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
-            self.periodicity[1] = graphene.periodicity[0]
-            self.periodicity[2] = graphene.periodicity[1]
+            new_Lx = 2 * graphene.box.Lz - lattice_spacing[2] + pore_width
+
+            new_box = mb.Box((new_Lx,
+                              graphene.box.Ly,
+                              graphene.box.Lz),
+                             (90, 90, 90)
+                             )
+            graphene.box = new_box
+
         elif slit_pore_dim == 1:
-            self.periodicity[0] = graphene.periodicity[0]
-            self.periodicity[1] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
-            self.periodicity[2] = graphene.periodicity[1]
+            new_Ly = 2 * graphene.box.Lz - lattice_spacing[2] + pore_width
+
+            new_box = mb.Box((graphene.box.Lx,
+                              new_Ly,
+                              graphene.box.Lz),
+                             (90, 90, 90)
+                             )
+            graphene.box = new_box
+
         elif slit_pore_dim == 2:
-            self.periodicity[0] = graphene.periodicity[0]
-            self.periodicity[1] = graphene.periodicity[1]
-            self.periodicity[2] = 2 * graphene.periodicity[2] - lattice_spacing[2] + pore_width
+            new_Lz = 2 * graphene.box.Lz - lattice_spacing[2] + pore_width
+
+            new_box = mb.Box((graphene.box.Lx,
+                              graphene.box.Ly,
+                              new_Lz),
+                             (90, 90, 90)
+                             )
+            graphene.box = new_box
+
         self.xyz -= np.min(self.xyz, axis=0)
+
 
 
 class GraphenePoreSolvent(mb.Compound):
@@ -120,16 +139,25 @@ class GraphenePoreSolvent(mb.Compound):
                             n_sheets=n_sheets, pore_width=pore_width,
                             slit_pore_dim=slit_pore_dim)
 
-        box = mb.Box(pore.periodicity)
+        box = mb.Box(lengths=[pore.box.Lx, pore.box.Ly, pore.box.Lz])
         if x_bulk != 0:
-            box.maxs[0] += 2 * x_bulk
+            box_max_0_direction = box.from_lo_hi_tilt_factors
+            box = mb.Box(lengths=[pore.box.Lx + 2 * x_bulk, box_max_0_direction.Ly, box_max_0_direction.Lz])
 
-        system = mb.solvate(pore, solvent, n_solvent, box=box, overlap=0.2)
+        system = mb.solvate(pore, solvent, n_solvent, box=[pore.box.Lx, pore.box.Ly, pore.box.Lz], overlap=0.2)
 
         for child in system.children:
             self.add(mb.clone(child))
 
-        self.periodicity = box.maxs
+        # reset box dimenstions to box maxes
+        box_max_all_direction = box.from_lo_hi_tilt_factors
+
+        box = mb.Box(lengths=[box_max_all_direction.box.Lx,
+                              box_max_all_direction.box.Ly,
+                              box_max_all_direction.box.Lz
+                              ]
+                     )
+        box.add(system, inherit_periodicity=False)
 
 
 class GrapheneSurface(mb.Compound):
@@ -176,10 +204,16 @@ class GrapheneSurface(mb.Compound):
 
         for particle in graphene.particles():
             if particle.xyz[0][0] < 0:
-                particle.xyz[0][0] += graphene.periodicity[0]
-        graphene.periodicity[1] *= factor  # cos(30)*.246
+                particle.xyz[0][0] += graphene.box.Lx
+
+        new_Lz_times_factor = graphene.box.Lz - lattice_spacing[2] + vacuum
+
+        new_box = mb.Box((graphene.box.Lx,
+                          graphene.box.Ly,
+                          new_Lz_times_factor),
+                         (90, 90, 90)
+                         )
+        graphene.box = new_box
+
         self.add(graphene)
-        self.periodicity[0] = graphene.periodicity[0]
-        self.periodicity[1] = graphene.periodicity[1]
-        self.periodicity[2] = graphene.periodicity[2] - lattice_spacing[2] + vacuum
         self.xyz -= np.min(self.xyz, axis=0)
