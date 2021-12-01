@@ -68,9 +68,10 @@ class GraphenePore(mb.Compound):
         top_sheet.name = 'TOP'
         self.add(top_sheet)
         self.add(bot_sheet)
+
         if slit_pore_dim == 0:
             new_Lx = 2 * graphene.box.Lz - lattice_spacing[2] + pore_width
-            new_Ly =  graphene.box.Lx
+            new_Ly = graphene.box.Lx
             new_Lz = factor * graphene.box.Ly
 
             new_box = mb.Box((new_Lx,
@@ -78,7 +79,7 @@ class GraphenePore(mb.Compound):
                               new_Lz),
                              (90, 90, 90)
                              )
-            graphene.box = new_box
+            self.box = new_box
 
         elif slit_pore_dim == 1:
             new_Lx = graphene.box.Lx
@@ -90,7 +91,7 @@ class GraphenePore(mb.Compound):
                               new_Lz),
                              (90, 90, 90)
                              )
-            graphene.box = new_box
+            self.box = new_box
 
         elif slit_pore_dim == 2:
             new_Lx = graphene.box.Lx
@@ -102,7 +103,7 @@ class GraphenePore(mb.Compound):
                               new_Lz),
                              (90, 90, 90)
                              )
-            graphene.box = new_box
+            self.box = new_box
 
         self.xyz -= np.min(self.xyz, axis=0)
 
@@ -169,7 +170,7 @@ class GraphenePoreSolvent(mb.Compound):
                           box_max_all_direction.box.Lz),
                          (90, 90, 90)
                          )
-        system.box = new_box
+        self.box = new_box
 
 
 class GrapheneSurface(mb.Compound):
@@ -218,15 +219,14 @@ class GrapheneSurface(mb.Compound):
             if particle.xyz[0][0] < 0:
                 particle.xyz[0][0] += graphene.box.Lx
 
-        new_Ly = graphene.box.Ly * factor
         new_Lz = graphene.box.Lz - lattice_spacing[2] + vacuum
 
         new_box = mb.Box((graphene.box.Lx,
-                          new_Ly,
+                          factor * graphene.box.Ly,
                           new_Lz),
                          (90, 90, 90)
                          )
-        graphene.box = new_box
+        self.box = new_box
 
         self.add(graphene)
         self.xyz -= np.min(self.xyz, axis=0)
