@@ -105,6 +105,10 @@ class GraphenePore(mb.Compound):
                              )
             self.box = new_box
 
+            box_max_0_direction = self.box.from_mins_maxs_angles
+            print('box_max_0_direction =  ' + str(box_max_0_direction.box))
+            print('box_max_0_direction[0] =  ' + str(box_max_0_direction))
+
         self.xyz -= np.min(self.xyz, axis=0)
 
 
@@ -148,8 +152,11 @@ class GraphenePoreSolvent(mb.Compound):
 
         box = mb.Box(lengths=[pore.box.Lx, pore.box.Ly, pore.box.Lz])
         if x_bulk != 0:
-            box_max_0_direction = box.from_lo_hi_tilt_factors
-            new_Lx = box_max_0_direction.Lx + 2 * x_bulk
+            # ***********************
+            # B Crawford notes: This needs checked yet. Not 100% sure if the old box.max is
+            # equilivent to box.Ly (i.e., the max box length with an angle or straight/right angle in the x-direction)
+            # ***********************
+            new_Lx = box.Lx + 2 * x_bulk
             new_box = mb.Box((new_Lx,
                               pore.box.Ly,
                               pore.box.Lz),
@@ -163,11 +170,13 @@ class GraphenePoreSolvent(mb.Compound):
             self.add(mb.clone(child))
 
         # reset box dimenstions to box maxes
-        box_max_all_direction = box.from_lo_hi_tilt_factors
-
-        new_box = mb.Box((box_max_all_direction.box.Lx,
-                          box_max_all_direction.box.Ly,
-                          box_max_all_direction.box.Lz),
+        # ***********************
+        # B Crawford notes: This needs checked yet. Not 100% sure if the old box.max is
+        # equilivent to box.Ly (i.e., the max box length with an angle or straight/right angle in the x-direction)
+        # ***********************
+        new_box = mb.Box((box.Lx,
+                          box.Ly,
+                          box.Lz),
                          (90, 90, 90)
                          )
         self.box = new_box
