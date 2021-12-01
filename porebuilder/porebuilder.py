@@ -219,10 +219,11 @@ class GrapheneSurface(mb.Compound):
             if particle.xyz[0][0] < 0:
                 particle.xyz[0][0] += graphene.box.Lx
 
+        new_Ly = factor * graphene.box.Ly
         new_Lz = graphene.box.Lz - lattice_spacing[2] + vacuum
 
         new_box = mb.Box((graphene.box.Lx,
-                          factor * graphene.box.Ly,
+                          new_Ly,
                           new_Lz),
                          (90, 90, 90)
                          )
