@@ -70,29 +70,35 @@ class GraphenePore(mb.Compound):
         self.add(bot_sheet)
         if slit_pore_dim == 0:
             new_Lx = 2 * graphene.box.Lz - lattice_spacing[2] + pore_width
+            new_Ly =  graphene.box.Lx
+            new_Lz = factor * graphene.box.Ly
 
             new_box = mb.Box((new_Lx,
-                              graphene.box.Ly,
-                              graphene.box.Lz),
+                              new_Ly,
+                              new_Lz),
                              (90, 90, 90)
                              )
             graphene.box = new_box
 
         elif slit_pore_dim == 1:
-            new_Ly = 2 * graphene.box.Lz - lattice_spacing[2] + pore_width
+            new_Lx = graphene.box.Lx
+            new_Ly =  2 * graphene.box.Lz - lattice_spacing[2] + pore_width
+            new_Lz = factor * graphene.box.Ly
 
-            new_box = mb.Box((graphene.box.Lx,
+            new_box = mb.Box((new_Lx,
                               new_Ly,
-                              graphene.box.Lz),
+                              new_Lz),
                              (90, 90, 90)
                              )
             graphene.box = new_box
 
         elif slit_pore_dim == 2:
+            new_Lx = graphene.box.Lx
+            new_Ly = factor * graphene.box.Ly
             new_Lz = 2 * graphene.box.Lz - lattice_spacing[2] + pore_width
 
-            new_box = mb.Box((graphene.box.Lx,
-                              graphene.box.Ly,
+            new_box = mb.Box((new_Lx,
+                              new_Ly,
                               new_Lz),
                              (90, 90, 90)
                              )
@@ -142,7 +148,12 @@ class GraphenePoreSolvent(mb.Compound):
         box = mb.Box(lengths=[pore.box.Lx, pore.box.Ly, pore.box.Lz])
         if x_bulk != 0:
             box_max_0_direction = box.from_lo_hi_tilt_factors
-            box = mb.Box(lengths=[pore.box.Lx + 2 * x_bulk, box_max_0_direction.Ly, box_max_0_direction.Lz])
+            new_box = mb.Box((box_max_0_direction.Lx + 2 * x_bulk,
+                              pore.box.Ly,
+                              pore.box.Lz),
+                             (90, 90, 90)
+                             )
+            box = new_box
 
         system = mb.solvate(pore, solvent, n_solvent, box=[pore.box.Lx, pore.box.Ly, pore.box.Lz], overlap=0.2)
 
@@ -152,12 +163,12 @@ class GraphenePoreSolvent(mb.Compound):
         # reset box dimenstions to box maxes
         box_max_all_direction = box.from_lo_hi_tilt_factors
 
-        box = mb.Box(lengths=[box_max_all_direction.box.Lx,
-                              box_max_all_direction.box.Ly,
-                              box_max_all_direction.box.Lz
-                              ]
-                     )
-        box.add(system, inherit_periodicity=False)
+        new_box = mb.Box((box_max_all_direction.box.Lx,
+                          box_max_all_direction.box.Ly,
+                          box_max_all_direction.box.Lz),
+                         (90, 90, 90)
+                         )
+        system.box = new_box
 
 
 class GrapheneSurface(mb.Compound):
@@ -206,11 +217,12 @@ class GrapheneSurface(mb.Compound):
             if particle.xyz[0][0] < 0:
                 particle.xyz[0][0] += graphene.box.Lx
 
-        new_Lz_times_factor = graphene.box.Lz - lattice_spacing[2] + vacuum
+        new_Ly = graphene.box.Ly * factor
+        new_Lz = graphene.box.Lz - lattice_spacing[2] + vacuum
 
         new_box = mb.Box((graphene.box.Lx,
-                          graphene.box.Ly,
-                          new_Lz_times_factor),
+                          new_Ly,
+                          new_Lz),
                          (90, 90, 90)
                          )
         graphene.box = new_box
