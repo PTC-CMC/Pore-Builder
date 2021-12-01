@@ -105,10 +105,6 @@ class GraphenePore(mb.Compound):
                              )
             self.box = new_box
 
-            box_max_0_direction = self.box.from_mins_maxs_angles
-            print('box_max_0_direction =  ' + str(box_max_0_direction.box))
-            print('box_max_0_direction[0] =  ' + str(box_max_0_direction))
-
         self.xyz -= np.min(self.xyz, axis=0)
 
 
