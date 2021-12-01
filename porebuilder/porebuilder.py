@@ -148,14 +148,15 @@ class GraphenePoreSolvent(mb.Compound):
         box = mb.Box(lengths=[pore.box.Lx, pore.box.Ly, pore.box.Lz])
         if x_bulk != 0:
             box_max_0_direction = box.from_lo_hi_tilt_factors
-            new_box = mb.Box((box_max_0_direction.Lx + 2 * x_bulk,
+            new_Lx = box_max_0_direction.Lx + 2 * x_bulk
+            new_box = mb.Box((new_Lx,
                               pore.box.Ly,
                               pore.box.Lz),
                              (90, 90, 90)
                              )
             box = new_box
 
-        system = mb.solvate(pore, solvent, n_solvent, box=[pore.box.Lx, pore.box.Ly, pore.box.Lz], overlap=0.2)
+        system = mb.solvate(pore, solvent, n_solvent, box=box, overlap=0.2)
 
         for child in system.children:
             self.add(mb.clone(child))
